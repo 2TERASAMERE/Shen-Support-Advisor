@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shen Support Advisor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C89B3C;
+    --gold-light: #F0E6D3;
+    --gold-dim: #785A28;
+    --blue-spirit: #0BC4E3;
+    --blue-dark: #091428;
+    --blue-mid: #0A1628;
+    --blue-panel: #0D1B2E;
+    --red-enemy: #E84057;
+    --green-ally: #0CBE6A;
+    --text-main: #C8AA6E;
+    --text-dim: #5C5B57;
+    --border: rgba(200,155,60,0.25);
+    --panel-bg: rgba(9,20,40,0.92);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Rajdhani', sans-serif;
+    background: var(--blue-dark);
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(11,196,227,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 80% 80%, rgba(200,155,60,0.05) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30Z' fill='none' stroke='rgba(200,155,60,0.03)' stroke-width='1'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .spirit-icon {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 12px;
+    filter: drop-shadow(0 0 20px rgba(11,196,227,0.6));
+    animation: pulse-spirit 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-spirit {
+    0%, 100% { filter: drop-shadow(0 0 20px rgba(11,196,227,0.6)); }
+    50% { filter: drop-shadow(0 0 35px rgba(11,196,227,0.9)); }
+  }
+
+  h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--gold-light);
+    text-shadow: 0 0 30px rgba(200,155,60,0.4);
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  /* Search panel */
+  .search-panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 28px 32px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .search-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .input-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .input-group {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  label {
+    display: block;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 8px;
+  }
+
+  input[type="text"], select {
+    width: 100%;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(200,155,60,0.3);
+    border-radius: 2px;
+    color: var(--gold-light);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  input[type="text"]:focus, select:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(200,155,60,0.15);
+  }
+
+  input::placeholder { color: var(--text-dim); }
+
+  select option { background: var(--blue-dark); }
+
+  .btn-search {
+    background: linear-gradient(135deg, #785A28, #C89B3C);
+    border: none;
+    color: #0A0A0A;
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 11px 28px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-search:hover {
+    background: linear-gradient(135deg, #C89B3C, #F0E6D3);
+    box-shadow: 0 0 20px rgba(200,155,60,0.4);
+  }
+
+  .btn-search:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* API Key notice */
+  .api-notice {
+    margin-top: 16px;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .api-notice a { color: var(--blue-spirit); text-decoration: none; }
+  .api-notice a:hover { text-decoration: underline; }
+
+  /* Status / Error */
+  .status-bar {
+    text-align: center;
+    padding: 16px;
+    border-radius: 3px;
+    font-size: 0.9rem;
+    margin-bottom: 24px;
+    display: none;
+  }
+
+  .status-bar.loading {
+    display: block;
+    border: 1px solid rgba(11,196,227,0.3);
+    color: var(--blue-spirit);
+    background: rgba(11,196,227,0.05);
+    animation: blink 1.2s ease-in-out infinite;
+  }
+
+  .status-bar.error {
+    display: block;
+    border: 1px solid rgba(232,64,87,0.3);
+    color: var(--red-enemy);
+    background: rgba(232,64,87,0.05);
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* Draft display */
+  .draft-section { display: none; }
+  .draft-section.visible { display: block; }
+
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* Teams grid */
+  .teams-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  @media (max-width: 600px) {
+    .teams-grid { grid-template-columns: 1fr; }
+  }
+
+  .team-panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .team-panel.ally { border-color: rgba(12,190,106,0.25); }
+  .team-panel.enemy { border-color: rgba(232,64,87,0.25); }
+
+  .team-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .team-panel.ally::before { background: linear-gradient(90deg, transparent, var(--green-ally), transparent); }
+  .team-panel.enemy::before { background: linear-gradient(90deg, transparent, var(--red-enemy), transparent); }
+
+  .team-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .ally .team-label { color: var(--green-ally); }
+  .enemy .team-label { color: var(--red-enemy); }
+
+  .champion-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+  .champion-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    border-radius: 2px;
+    background: rgba(0,0,0,0.25);
+  }
+
+  .champion-item.is-me {
+    background: rgba(200,155,60,0.1);
+    border: 1px solid rgba(200,155,60,0.3);
+  }
+
+  .champ-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid rgba(200,155,60,0.3);
+    object-fit: cover;
+    flex-shrink: 0;
+    background: var(--blue-mid);
+  }
+
+  .champ-icon.is-me { border-color: var(--gold); }
+
+  .champ-info { flex: 1; }
+  .champ-name { font-size: 0.95rem; font-weight: 600; color: var(--gold-light); }
+  .champ-role {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .you-badge {
+    font-size: 0.65rem;
+    background: var(--gold-dim);
+    color: var(--blue-dark);
+    padding: 2px 6px;
+    border-radius: 1px;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.1em;
+  }
+
+  /* Build recommendation */
+  .build-panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 28px 32px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 32px;
+  }
+
+  .build-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--blue-spirit), transparent);
+  }
+
+  .items-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+    align-items: flex-start;
+  }
+
+  .item-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 80px;
+    text-align: center;
+  }
+
+  .item-icon-wrap {
+    position: relative;
+    width: 56px;
+    height: 56px;
+  }
+
+  .item-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 4px;
+    border: 2px solid var(--gold-dim);
+    object-fit: cover;
+    background: var(--blue-mid);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .item-icon.core { border-color: var(--gold); box-shadow: 0 0 12px rgba(200,155,60,0.35); }
+  .item-icon.situational { border-color: var(--blue-spirit); }
+
+  .item-order {
+    position: absolute;
+    top: -6px; left: -6px;
+    width: 18px; height: 18px;
+    background: var(--blue-dark);
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--gold);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .item-name {
+    font-size: 0.68rem;
+    color: var(--text-main);
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+  }
+
+  .item-tag {
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 5px;
+    border-radius: 1px;
+  }
+
+  .tag-core { background: rgba(200,155,60,0.15); color: var(--gold); }
+  .tag-situational { background: rgba(11,196,227,0.12); color: var(--blue-spirit); }
+  .tag-boots { background: rgba(92,91,87,0.3); color: var(--text-dim); }
+
+  .separator {
+    width: 1px;
+    height: 56px;
+    background: linear-gradient(180deg, transparent, var(--border), transparent);
+    margin: 0 4px;
+    align-self: flex-start;
+    margin-top: 12px;
+  }
+
+  /* Reasoning */
+  .reasoning-block {
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+  }
+
+  .reasoning-title {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 12px;
+  }
+
+  .threat-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .threat-tag {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 2px;
+    border: 1px solid;
+  }
+
+  .threat-tag.ad { border-color: rgba(232,64,87,0.4); color: #FF6B7A; background: rgba(232,64,87,0.08); }
+  .threat-tag.ap { border-color: rgba(100,120,255,0.4); color: #8899FF; background: rgba(100,120,255,0.08); }
+  .threat-tag.mixed { border-color: rgba(200,155,60,0.4); color: var(--gold); background: rgba(200,155,60,0.08); }
+  .threat-tag.engage { border-color: rgba(11,196,227,0.4); color: var(--blue-spirit); background: rgba(11,196,227,0.08); }
+  .threat-tag.poke { border-color: rgba(120,200,80,0.4); color: #88CC55; background: rgba(120,200,80,0.08); }
+
+  .reasoning-text {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: #9A9085;
+  }
+
+  .reasoning-text strong { color: var(--text-main); }
+
+  /* Manual mode */
+  .manual-mode {
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 24px 28px;
+    margin-top: 16px;
+  }
+
+  .manual-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.2em;
+    color: var(--gold-dim);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+
+  .champ-inputs { display: flex; flex-direction: column; gap: 10px; }
+
+  .role-input-row {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .role-badge {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-align: right;
+  }
+
+  .btn-manual {
+    margin-top: 16px;
+    background: transparent;
+    border: 1px solid var(--gold-dim);
+    color: var(--gold);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 9px 24px;
+    border-radius: 2px;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    transition: all 0.2s;
+  }
+
+  .btn-manual:hover {
+    background: rgba(200,155,60,0.1);
+    border-color: var(--gold);
+  }
+
+  .toggle-manual-btn {
+    background: none;
+    border: none;
+    color: var(--blue-spirit);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    text-decoration: underline;
+    letter-spacing: 0.05em;
+    margin-top: 10px;
+    display: inline-block;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    margin-top: 48px;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    line-height: 1.8;
+  }
+
+  footer a { color: var(--gold-dim); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <span class="spirit-icon">🔵</span>
+    <h1>SHEN · SUPPORT ADVISOR</h1>
+    <p class="subtitle">Itemisation selon la draft · EUW</p>
+  </header>
+
+  <!-- Search -->
+  <div class="search-panel">
+    <div class="input-row">
+      <div class="input-group">
+        <label>Riot ID</label>
+        <input type="text" id="riotId" placeholder="Pseudo#EUW1" value="">
+      </div>
+      <div class="input-group" style="max-width:120px">
+        <label>Région</label>
+        <select id="region">
+          <option value="euw1">EUW</option>
+          <option value="eun1">EUNE</option>
+          <option value="na1">NA</option>
+          <option value="kr">KR</option>
+          <option value="br1">BR</option>
+        </select>
+      </div>
+      <button class="btn-search" id="searchBtn" onclick="fetchLiveGame()">
+        ANALYSER LA PARTIE
+      </button>
+    </div>
+    <div class="api-notice">
+      ⚙️ Ce site utilise un proxy Vercel sécurisé. Clé API non exposée. ·
+      <a href="https://developer.riotgames.com" target="_blank">Riot Dev Portal</a>
+    </div>
+    <button class="toggle-manual-btn" onclick="toggleManual()">
+      → Entrer la draft manuellement
+    </button>
+  </div>
+
+  <!-- Manual input -->
+  <div class="manual-mode" id="manualMode" style="display:none">
+    <div class="manual-title">Draft manuelle</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div>
+        <div style="font-size:0.72rem;letter-spacing:0.15em;color:var(--green-ally);margin-bottom:10px;text-transform:uppercase">Équipe Alliée</div>
+        <div class="champ-inputs" id="allyInputs">
+          <div class="role-input-row"><span class="role-badge">Top</span><input type="text" placeholder="Champion allié top" id="ally0"></div>
+          <div class="role-input-row"><span class="role-badge">Jungle</span><input type="text" placeholder="Champion allié jungle" id="ally1"></div>
+          <div class="role-input-row"><span class="role-badge">Mid</span><input type="text" placeholder="Champion allié mid" id="ally2"></div>
+          <div class="role-input-row"><span class="role-badge">ADC</span><input type="text" placeholder="Champion allié ADC" id="ally3"></div>
+          <div class="role-input-row"><span class="role-badge">Support</span><input type="text" value="Shen" disabled id="ally4" style="opacity:0.5"></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:0.72rem;letter-spacing:0.15em;color:var(--red-enemy);margin-bottom:10px;text-transform:uppercase">Équipe Ennemie</div>
+        <div class="champ-inputs" id="enemyInputs">
+          <div class="role-input-row"><span class="role-badge">Top</span><input type="text" placeholder="Champion ennemi top" id="enemy0"></div>
+          <div class="role-input-row"><span class="role-badge">Jungle</span><input type="text" placeholder="Champion ennemi jungle" id="enemy1"></div>
+          <div class="role-input-row"><span class="role-badge">Mid</span><input type="text" placeholder="Champion ennemi mid" id="enemy2"></div>
+          <div class="role-input-row"><span class="role-badge">ADC</span><input type="text" placeholder="Champion ennemi ADC" id="enemy3"></div>
+          <div class="role-input-row"><span class="role-badge">Support</span><input type="text" placeholder="Champion ennemi support" id="enemy4"></div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-manual" onclick="analyzeManual()">GÉNÉRER LE BUILD</button>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar" id="statusBar"></div>
+
+  <!-- Draft display -->
+  <div class="draft-section" id="draftSection">
+    <div class="section-title">Draft en cours</div>
+    <div class="teams-grid">
+      <div class="team-panel ally">
+        <div class="team-label">⚔️ Équipe Alliée</div>
+        <ul class="champion-list" id="allyList"></ul>
+      </div>
+      <div class="team-panel enemy">
+        <div class="team-label">💀 Équipe Ennemie</div>
+        <ul class="champion-list" id="enemyList"></ul>
+      </div>
+    </div>
+
+    <div class="section-title">Build recommandé</div>
+    <div class="build-panel">
+      <div class="items-row" id="itemsRow"></div>
+      <div class="reasoning-block">
+        <div class="reasoning-title">Analyse de la composition</div>
+        <div class="threat-tags" id="threatTags"></div>
+        <div class="reasoning-text" id="reasoningText"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Shen Support Advisor · Non affilié à Riot Games<br>
+    League of Legends © Riot Games, Inc. · Données via <a href="https://developer.riotgames.com">Riot API</a>
+  </footer>
+</div>
+
+<script>
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+// En production: pointe vers ton backend Vercel
+// En local: utilise directement l'API Riot (clé dans le localStorage)
+const PROXY_URL = '/api'; // à remplacer par ton URL Vercel en prod
+
+// ─── ITEM DATABASE ───────────────────────────────────────────────────────────
+const ITEMS = {
+  // Core fixed
+  bandle: {
+    id: 227055,
+    name: "Flûte de Bandle",
+    tag: "core",
+    icon: "https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/227055.png",
+    order: 1,
+    notes: "Core inamovible. Résistances duales, bouclier actif, parfait pour Shen."
+  },
+  harnais: {
+    id: 3068,
+    name: "Harnais Protoplasmique",
+    tag: "core",
+    icon: "https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/3068.png",
+    order: 2,
+    notes: "Core fixe. HP massifs + passive Immolate pour la présence en teamfight."
+  },
+  // Boots
+  boots_plated: {
+    id: 3047,
+    name: "Tabi Ninja",
+    tag: "boots",
+    icon: "https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/3047.png",
+    notes: "Contre une compo full AD ou beaucoup d'AA."
+  },
+  boots_merc: {
+    id: 3111,
+    name: "Bottes de Mercure",
+    tag: "boots",
+    icon: "https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/3111.png",
+    notes: "Contre beaucoup de CC ou de dégâts magiques."
+  },
+  boots_swifty: {
+    id: 3009,
+    name: "Bottes de Rapidité",
+    tag: "boots",
+    icon: "https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/3009.png",
+    notes: "Si tu n'as pas besoin de résistances, mobilité pure."
+  },
+  // Situational
+  locket: {
+    id: 3190,
+    name: "Locket de l'Épouvantail de Fer",
+    tag: "situational",
+    icon: "https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/3190.png",
+    notes: "Indispensable si ennemis avec AoE burst. Bouclier sur ton ulti."
+  },
+  knights_vow: {
+    id: 3109,
+    name: "Vœu du Chevalier",
+    tag: "situational",
+    icon: "https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/3109.png",
+    notes: "Si ton ADC est le carry principal et qu'il se fait diver."
+  },
+  aegis: {
+    id: 3105,
+    name: "Bouclier Solaire",
+    tag: "situational",
+    icon: "https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/3105.png",
+    notes: "Contre dégâts magiques lourds. Aura MR pour ton équipe."
+  },
+  warmogs: {
+    id: 3083,
+    name: "Armure de Warmog",
+    tag: "situational",
+    icon: "https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/3083.png",
+    notes: "Si tu as besoin de sustain entre les fights. Synergie excellente avec Shen."
+  },
+  gargoyle: {
+    id: 3193,
+    name: "Stoneplate de Gargouille",
+    tag: "situational",
+    icon: "https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/3193.png",
+    notes: "Contre compos mixtes ou lourdes teamfight. Actif massif pour engager."
+  },
+  redemption: {
+    id: 3107,
+    name: "Rédemption",
+    tag: "situational",
+    icon: "https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/3107.png",
+    notes: "Contre poke. Heal zone à distance, très puissant en fights prolongés."
+  },
+  frozen_heart: {
+    id: 3110,
+    name: "Cœur Gelé",
+    tag: "situational",
+    icon: "https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/3110.png",
+    notes: "Contre full AD ou ADC/bruisers qui auto-attaquent beaucoup."
+  },
+  thornmail: {
+    id: 3075,
+    name: "Mail Épineux",
+    tag: "situational",
+    icon: "https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/3075.png",
+    notes: "Contre compo AD avec healing important (Lifesteal, Aatrox, etc.)."
+  },
+  abyssal: {
+    id: 3001,
+    name: "Masque Abyssal",
+    tag: "situational",
+    icon: "https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/3001.png",
+    notes: "Si alliés AP. Amplifie leurs dégâts et te donne de la MR."
+  },
+  force_of_nature: {
+    id: 3076,
+    name: "Force de la Nature",
+    tag: "situational",
+    icon: "https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/3076.png",
+    notes: "Contre compo full AP ou lourde en magic damage."
+  }
+};
+
+// Champion role detection & threat classification
+const CHAMPIONS_DATA = {
+  // AD carries
+  "jinx": {type: "ad", role: "ADC"}, "caitlyn": {type: "ad", role: "ADC"},
+  "jhin": {type: "ad", role: "ADC"}, "ezreal": {type: "mixed", role: "ADC"},
+  "kai'sa": {type: "mixed", role: "ADC"}, "kaisa": {type: "mixed", role: "ADC"},
+  "vayne": {type: "ad", role: "ADC"}, "draven": {type: "ad", role: "ADC"},
+  "aphelios": {type: "ad", role: "ADC"}, "xayah": {type: "ad", role: "ADC"},
+  "miss fortune": {type: "mixed", role: "ADC"}, "ashe": {type: "ad", role: "ADC"},
+  "sivir": {type: "ad", role: "ADC"}, "twitch": {type: "ad", role: "ADC"},
+  "tristana": {type: "ad", role: "ADC"}, "kog'maw": {type: "mixed", role: "ADC"},
+  "kogmaw": {type: "mixed", role: "ADC"}, "lucian": {type: "ad", role: "ADC"},
+  "samira": {type: "ad", role: "ADC"}, "nilah": {type: "ad", role: "ADC"},
+  "corki": {type: "mixed", role: "ADC"},
+  // AP mages
+  "lux": {type: "ap", role: "Mid"}, "syndra": {type: "ap", role: "Mid"},
+  "orianna": {type: "ap", role: "Mid"}, "zoe": {type: "ap", role: "Mid"},
+  "viktor": {type: "ap", role: "Mid"}, "azir": {type: "ap", role: "Mid"},
+  "cassiopeia": {type: "ap", role: "Mid"}, "xerath": {type: "ap", role: "Mid"},
+  "veigar": {type: "ap", role: "Mid"}, "annie": {type: "ap", role: "Mid"},
+  "brand": {type: "ap", role: "Support"}, "zyra": {type: "ap", role: "Support"},
+  "karma": {type: "ap", role: "Support"}, "morgana": {type: "ap", role: "Support"},
+  "vel'koz": {type: "ap", role: "Support"}, "velkoz": {type: "ap", role: "Support"},
+  "leblanc": {type: "ap", role: "Mid"}, "fizz": {type: "ap", role: "Mid"},
+  "ahri": {type: "ap", role: "Mid"}, "sylas": {type: "ap", role: "Mid"},
+  "twisted fate": {type: "ap", role: "Mid"}, "akali": {type: "ap", role: "Mid"},
+  "diana": {type: "ap", role: "Mid"}, "ekko": {type: "ap", role: "Mid"},
+  "taliyah": {type: "ap", role: "Mid"}, "anivia": {type: "ap", role: "Mid"},
+  "malzahar": {type: "ap", role: "Mid"}, "seraphine": {type: "ap", role: "Support"},
+  // Bruisers / AD top
+  "garen": {type: "ad", role: "Top"}, "darius": {type: "ad", role: "Top"},
+  "fiora": {type: "ad", role: "Top"}, "camille": {type: "ad", role: "Top"},
+  "renekton": {type: "ad", role: "Top"}, "irelia": {type: "mixed", role: "Top"},
+  "jax": {type: "mixed", role: "Top"}, "tryndamere": {type: "ad", role: "Top"},
+  "nasus": {type: "ad", role: "Top"}, "gnar": {type: "mixed", role: "Top"},
+  "riven": {type: "ad", role: "Top"}, "jayce": {type: "mixed", role: "Top"},
+  "pantheon": {type: "ad", role: "Top"}, "wukong": {type: "ad", role: "Top"},
+  "mordekaiser": {type: "ap", role: "Top"}, "malphite": {type: "ap", role: "Top"},
+  "volibear": {type: "mixed", role: "Top"}, "sett": {type: "ad", role: "Top"},
+  "aatrox": {type: "ad", role: "Top"}, "olaf": {type: "ad", role: "Top"},
+  "illaoi": {type: "ad", role: "Top"}, "teemo": {type: "ap", role: "Top"},
+  "gangplank": {type: "mixed", role: "Top"},
+  // Engage / CC supports
+  "thresh": {type: "mixed", role: "Support"}, "leona": {type: "ad", role: "Support"},
+  "nautilus": {type: "mixed", role: "Support"}, "blitzcrank": {type: "ad", role: "Support"},
+  "alistar": {type: "mixed", role: "Support"}, "rakan": {type: "mixed", role: "Support"},
+  "lulu": {type: "ap", role: "Support"}, "janna": {type: "ap", role: "Support"},
+  "soraka": {type: "ap", role: "Support"}, "nami": {type: "ap", role: "Support"},
+  "sona": {type: "ap", role: "Support"}, "bard": {type: "mixed", role: "Support"},
+  // Junglers
+  "vi": {type: "ad", role: "Jungle"}, "jarvan iv": {type: "ad", role: "Jungle"},
+  "jarvaniv": {type: "ad", role: "Jungle"}, "hecarim": {type: "ad", role: "Jungle"},
+  "master yi": {type: "ad", role: "Jungle"}, "masteryi": {type: "ad", role: "Jungle"},
+  "khazix": {type: "ad", role: "Jungle"}, "kha'zix": {type: "ad", role: "Jungle"},
+  "graves": {type: "ad", role: "Jungle"}, "nocturne": {type: "ad", role: "Jungle"},
+  "udyr": {type: "mixed", role: "Jungle"}, "shyvana": {type: "mixed", role: "Jungle"},
+  "nidalee": {type: "ap", role: "Jungle"}, "elise": {type: "ap", role: "Jungle"},
+  "diana": {type: "ap", role: "Jungle"}, "evelynn": {type: "ap", role: "Jungle"},
+  "viego": {type: "ad", role: "Jungle"}, "kayn": {type: "mixed", role: "Jungle"},
+  "rengar": {type: "ad", role: "Jungle"}, "lee sin": {type: "ad", role: "Jungle"},
+  "leesin": {type: "ad", role: "Jungle"}, "zac": {type: "ap", role: "Jungle"},
+  "amumu": {type: "ap", role: "Jungle"}, "sejuani": {type: "mixed", role: "Jungle"},
+};
+
+// ─── ITEM RECOMMENDATION ENGINE ──────────────────────────────────────────────
+function analyzeDraft(allies, enemies) {
+  let adCount = 0, apCount = 0, mixedCount = 0;
+  let hasHeavyCC = false, hasPoke = false, hasDive = false, hasHeal = false;
+
+  const threats = { ad: 0, ap: 0, mixed: 0 };
+
+  enemies.forEach(name => {
+    const key = name.toLowerCase().trim();
+    const data = CHAMPIONS_DATA[key];
+    if (!data) { threats.mixed += 0.5; return; }
+    if (data.type === 'ad') threats.ad++;
+    else if (data.type === 'ap') threats.ap++;
+    else threats.mixed += 0.5, threats.ad += 0.25, threats.ap += 0.25;
+  });
+
+  // Detect specific patterns
+  const enemyLower = enemies.map(e => e.toLowerCase().trim());
+  const allyLower = allies.map(a => a.toLowerCase().trim());
+
+  hasPoke = enemyLower.some(e => ['xerath','vel\'koz','velkoz','lux','caitlyn','ezreal','jayce','zoe','karma'].includes(e));
+  hasDive = enemyLower.some(e => ['fizz','zed','talon','rengar','kayn','nocturne','vi','jarvan iv','jarvaniv'].includes(e));
+  hasHeal = enemyLower.some(e => ['aatrox','soraka','yuumi','sona','nami','vladimir'].includes(e));
+  const alliesHaveAP = allyLower.some(e => {
+    const d = CHAMPIONS_DATA[e]; return d && d.type === 'ap';
+  });
+  const heavyAD = threats.ad >= 3;
+  const heavyAP = threats.ap >= 3;
+  const isFullAD = threats.ap === 0 && threats.ad >= 2;
+  const isFullAP = threats.ad === 0 && threats.ap >= 2;
+  const isMixed = !isFullAD && !isFullAP;
+
+  // Build the recommendation
+  let build = [];
+
+  // Slot 1: Core - Flûte (always)
+  build.push({ ...ITEMS.bandle, order: 1 });
+
+  // Slot 2: Core - Harnais (always)
+  build.push({ ...ITEMS.harnais, order: 2 });
+
+  // Slot 3: Boots
+  let boots;
+  if (isFullAD || threats.ad >= 3) boots = { ...ITEMS.boots_plated, order: 3 };
+  else if (isFullAP || threats.ap >= 3) boots = { ...ITEMS.boots_merc, order: 3 };
+  else boots = { ...ITEMS.boots_swifty, order: 3 };
+  build.push(boots);
+
+  // Slot 4
+  if (hasPoke) build.push({ ...ITEMS.redemption, order: 4 });
+  else if (heavyAP) build.push({ ...ITEMS.force_of_nature, order: 4 });
+  else if (heavyAD && hasHeal) build.push({ ...ITEMS.thornmail, order: 4 });
+  else if (heavyAD) build.push({ ...ITEMS.frozen_heart, order: 4 });
+  else if (hasDive) build.push({ ...ITEMS.knights_vow, order: 4 });
+  else build.push({ ...ITEMS.locket, order: 4 });
+
+  // Slot 5
+  if (isMixed) build.push({ ...ITEMS.gargoyle, order: 5 });
+  else if (isFullAP) build.push({ ...ITEMS.aegis, order: 5 });
+  else if (isFullAD && hasHeal) build.push({ ...ITEMS.thornmail, order: 5 });
+  else if (alliesHaveAP) build.push({ ...ITEMS.abyssal, order: 5 });
+  else build.push({ ...ITEMS.warmogs, order: 5 });
+
+  // Slot 6
+  if (!build.find(i => i.name.includes("Locket"))) build.push({ ...ITEMS.locket, order: 6 });
+  else if (!build.find(i => i.name.includes("Warmog"))) build.push({ ...ITEMS.warmogs, order: 6 });
+  else build.push({ ...ITEMS.gargoyle, order: 6 });
+
+  // Reasoning
+  const tags = [];
+  if (threats.ad >= 2) tags.push({ label: `AD (${Math.round(threats.ad)})`, cls: 'ad' });
+  if (threats.ap >= 2) tags.push({ label: `AP (${Math.round(threats.ap)})`, cls: 'ap' });
+  if (isMixed && enemies.length > 0) tags.push({ label: 'Dégâts mixtes', cls: 'mixed' });
+  if (hasDive) tags.push({ label: 'Dive threat', cls: 'engage' });
+  if (hasPoke) tags.push({ label: 'Poke comp', cls: 'poke' });
+  if (hasHeal) tags.push({ label: 'Healing ennemi', cls: 'ap' });
+
+  const reasoning = generateReasoning(build, threats, isFullAD, isFullAP, hasPoke, hasDive, hasHeal, alliesHaveAP);
+
+  return { build, tags, reasoning };
+}
+
+function generateReasoning(build, threats, isFullAD, isFullAP, hasPoke, hasDive, hasHeal, alliesHaveAP) {
+  let text = `<strong>Flûte de Bandle</strong> et <strong>Harnais Protoplasmique</strong> constituent le socle de ton build — résistances duales, HP massifs et présence constante en teamfight.<br><br>`;
+
+  if (isFullAD) text += `La composition ennemie est <strong>dominée par de l'AD</strong>. On oriente les items situationnels vers l'armure (<strong>Tabi Ninja</strong>${hasDive ? ', protection anti-dive' : ''}).`;
+  else if (isFullAP) text += `La composition ennemie est <strong>dominée par du AP</strong>. On privilégie la résistance magique (<strong>Bottes de Mercure, Force de la Nature</strong>) pour rester efficace en survie.`;
+  else text += `La composition ennemie est <strong>mixte</strong>. On construit vers la tankiness globale avec des items comme <strong>Stoneplate de Gargouille</strong> pour maximiser la survie dans tous les scénarios.`;
+
+  if (hasPoke) text += `<br><br>⚠️ <strong>Compo poke détectée</strong> — <strong>Rédemption</strong> est priorisée pour le soin à distance et la résistance au chip damage. Engage prudemment.`;
+  if (hasDive) text += `<br><br>⚠️ <strong>Threat de dive</strong> — Le <strong>Vœu du Chevalier</strong> protège ton carry prioritaire si l'ennemi cherche à le tuer directement sous ton ulti.`;
+  if (hasHeal) text += `<br><br>⚠️ <strong>Healing ennemi significatif</strong> — Le <strong>Mail Épineux</strong> est recommandé pour réduire l'efficacité des soins.`;
+  if (alliesHaveAP) text += `<br><br>✨ <strong>Alliés AP</strong> présents — Le <strong>Masque Abyssal</strong> amplifie leurs dégâts via son aura tout en te donnant de la MR.`;
+
+  return text;
+}
+
+// ─── DISPLAY FUNCTIONS ────────────────────────────────────────────────────────
+const ROLES_ORDER = ['Top', 'Jungle', 'Mid', 'ADC', 'Support'];
+const POSITION_MAP = {
+  'TOP': 'Top', 'JUNGLE': 'Jungle', 'MIDDLE': 'Mid',
+  'BOTTOM': 'ADC', 'UTILITY': 'Support'
+};
+
+function renderChampList(listId, champs, highlightName) {
+  const ul = document.getElementById(listId);
+  ul.innerHTML = '';
+  champs.forEach(c => {
+    const isMe = c.name.toLowerCase() === (highlightName || '').toLowerCase();
+    const iconUrl = `https://ddragon.leagueoflegends.com/cdn/15.6.1/img/champion/${formatChampKey(c.name)}.png`;
+    ul.innerHTML += `
+      <li class="champion-item ${isMe ? 'is-me' : ''}">
+        <img class="champ-icon ${isMe ? 'is-me' : ''}" src="${iconUrl}" onerror="this.src='https://ddragon.leagueoflegends.com/cdn/15.6.1/img/champion/Shen.png'" alt="${c.name}">
+        <div class="champ-info">
+          <div class="champ-name">${c.name}</div>
+          <div class="champ-role">${c.role}</div>
+        </div>
+        ${isMe ? '<span class="you-badge">YOU</span>' : ''}
+      </li>`;
+  });
+}
+
+function formatChampKey(name) {
+  const exceptions = {
+    "Wukong": "MonkeyKing", "Renata Glasc": "Renata",
+    "Kai'Sa": "Kaisa", "Kha'Zix": "Khazix", "Vel'Koz": "Velkoz",
+    "Rek'Sai": "RekSai", "Cho'Gath": "Chogath", "Kog'Maw": "KogMaw",
+    "LeBlanc": "Leblanc", "Lee Sin": "LeeSin", "Master Yi": "MasterYi",
+    "Miss Fortune": "MissFortune", "Jarvan IV": "JarvanIV",
+    "Twisted Fate": "TwistedFate", "Xin Zhao": "XinZhao",
+    "Aurelion Sol": "AurelionSol", "Bel'Veth": "Belveth",
+    "K'Sante": "KSante", "Dr. Mundo": "DrMundo"
+  };
+  if (exceptions[name]) return exceptions[name];
+  return name.replace(/[^a-zA-Z0-9]/g, '').replace(/^\w/, c => c.toUpperCase());
+}
+
+function renderBuild(build, tags, reasoning) {
+  const row = document.getElementById('itemsRow');
+  row.innerHTML = '';
+
+  build.forEach((item, i) => {
+    if (i === 2) {
+      // Add separator before boots
+      row.innerHTML += `<div class="separator"></div>`;
+    }
+    row.innerHTML += `
+      <div class="item-card">
+        <div class="item-icon-wrap">
+          <span class="item-order">${item.order}</span>
+          <img class="item-icon ${item.tag}" src="${item.icon}"
+            onerror="this.style.background='#1a2a3a'"
+            alt="${item.name}" title="${item.notes}">
+        </div>
+        <div class="item-name">${item.name}</div>
+        <span class="item-tag tag-${item.tag}">${item.tag === 'core' ? 'Core' : item.tag === 'boots' ? 'Bottes' : 'Situa.'}</span>
+      </div>`;
+  });
+
+  // Tags
+  const tagsEl = document.getElementById('threatTags');
+  tagsEl.innerHTML = tags.map(t => `<span class="threat-tag ${t.cls}">${t.label}</span>`).join('');
+
+  // Reasoning
+  document.getElementById('reasoningText').innerHTML = reasoning;
+}
+
+function showDraft(allies, enemies, myChampName) {
+  renderChampList('allyList', allies, myChampName);
+  renderChampList('enemyList', enemies, '');
+  document.getElementById('draftSection').classList.add('visible');
+}
+
+// ─── API FUNCTIONS ────────────────────────────────────────────────────────────
+async function fetchLiveGame() {
+  const riotIdRaw = document.getElementById('riotId').value.trim();
+  const region = document.getElementById('region').value;
+
+  if (!riotIdRaw.includes('#')) {
+    showError('Format attendu : Pseudo#TAG (ex: Faker#T1)');
+    return;
+  }
+
+  const [gameName, tagLine] = riotIdRaw.split('#');
+  showLoading('Recherche de la partie en cours...');
+  document.getElementById('searchBtn').disabled = true;
+
+  try {
+    // Call the Vercel proxy
+    const res = await fetch(`${PROXY_URL}/live-game?gameName=${encodeURIComponent(gameName)}&tagLine=${encodeURIComponent(tagLine)}&region=${region}`);
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || 'Erreur API');
+    }
+
+    if (!data.participants || data.participants.length === 0) {
+      throw new Error('Aucune partie en cours trouvée pour ce joueur.');
+    }
+
+    processLiveGameData(data, riotIdRaw);
+  } catch (err) {
+    showError(err.message);
+  } finally {
+    document.getElementById('searchBtn').disabled = false;
+  }
+}
+
+function processLiveGameData(data, myRiotId) {
+  const myName = myRiotId.split('#')[0].toLowerCase();
+  const myParticipant = data.participants.find(p =>
+    p.riotId?.toLowerCase().includes(myName) ||
+    p.summonerName?.toLowerCase().includes(myName)
+  );
+
+  const myTeamId = myParticipant?.teamId || 100;
+  const allies = [], enemies = [];
+
+  data.participants.forEach(p => {
+    const entry = {
+      name: p.championName || p.champion || 'Unknown',
+      role: POSITION_MAP[p.teamPosition] || p.position || '?'
+    };
+    if (p.teamId === myTeamId) allies.push(entry);
+    else enemies.push(entry);
+  });
+
+  // Sort by role
+  const sortByRole = arr => arr.sort((a, b) =>
+    ROLES_ORDER.indexOf(a.role) - ROLES_ORDER.indexOf(b.role));
+
+  sortByRole(allies);
+  sortByRole(enemies);
+
+  hideStatus();
+  showDraft(allies, enemies, myParticipant?.championName || 'Shen');
+
+  const { build, tags, reasoning } = analyzeDraft(
+    allies.map(a => a.name),
+    enemies.map(e => e.name)
+  );
+  renderBuild(build, tags, reasoning);
+}
+
+// ─── MANUAL MODE ──────────────────────────────────────────────────────────────
+function toggleManual() {
+  const m = document.getElementById('manualMode');
+  m.style.display = m.style.display === 'none' ? 'block' : 'none';
+}
+
+function analyzeManual() {
+  const roles = ['Top', 'Jungle', 'Mid', 'ADC', 'Support'];
+  const allies = [], enemies = [];
+
+  roles.forEach((role, i) => {
+    const allyVal = document.getElementById(`ally${i}`)?.value.trim();
+    const enemyVal = document.getElementById(`enemy${i}`)?.value.trim();
+    if (allyVal && i !== 4) allies.push({ name: allyVal, role });
+    else if (i === 4) allies.push({ name: 'Shen', role: 'Support' });
+    if (enemyVal) enemies.push({ name: enemyVal, role });
+  });
+
+  if (enemies.filter(e => e.name).length === 0) {
+    showError('Entre au moins quelques champions ennemis.');
+    return;
+  }
+
+  hideStatus();
+  showDraft(allies, enemies, 'Shen');
+
+  const { build, tags, reasoning } = analyzeDraft(
+    allies.map(a => a.name),
+    enemies.map(e => e.name)
+  );
+  renderBuild(build, tags, reasoning);
+}
+
+// ─── UI HELPERS ───────────────────────────────────────────────────────────────
+function showLoading(msg) {
+  const el = document.getElementById('statusBar');
+  el.className = 'status-bar loading';
+  el.textContent = '⏳ ' + msg;
+}
+
+function showError(msg) {
+  const el = document.getElementById('statusBar');
+  el.className = 'status-bar error';
+  el.textContent = '⚠️ ' + msg;
+}
+
+function hideStatus() {
+  document.getElementById('statusBar').className = 'status-bar';
+}
+
+// Enter key support
+document.getElementById('riotId').addEventListener('keydown', e => {
+  if (e.key === 'Enter') fetchLiveGame();
+});
+</script>
+</body>
+</html>
