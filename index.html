@@ -16,8 +16,8 @@
     --blue-mid: #0A1628;
     --red-enemy: #E84057;
     --green-ally: #0CBE6A;
-    --text-main: #C8AA6E;
-    --text-dim: #5C5B57;
+    --text-main: #E8DCC8;
+    --text-dim: #8A8880;
     --border: rgba(200,155,60,0.25);
     --panel-bg: rgba(9,20,40,0.92);
   }
@@ -226,7 +226,7 @@
   .tab:hover:not(.active) { border-color: rgba(200,155,60,0.4); color: var(--text-main); }
 
   /* Knowledge */
-  .knowledge-hint { font-size: 0.78rem; color: var(--text-dim); margin-bottom: 12px; line-height: 1.65; }
+  .knowledge-hint { font-size: 0.78rem; color: #B0A898; margin-bottom: 12px; line-height: 1.65; }
   .knowledge-hint code { background: rgba(200,155,60,0.1); color: var(--gold); padding: 1px 5px; border-radius: 2px; }
 
   .save-badge { font-size: 0.7rem; color: var(--green-ally); display: none; animation: fadeout 2.2s forwards; }
@@ -317,7 +317,7 @@
   .champion-item.is-me { background: rgba(200,155,60,0.1); border: 1px solid rgba(200,155,60,0.28); }
   .champ-icon { width: 32px; height: 32px; border-radius: 50%; border: 2px solid rgba(200,155,60,0.22); object-fit: cover; flex-shrink: 0; background: var(--blue-mid); }
   .champ-icon.is-me { border-color: var(--gold); }
-  .champ-name { font-size: 0.9rem; font-weight: 600; color: var(--gold-light); }
+  .champ-name { font-size: 0.9rem; font-weight: 600; color: #FFFFFF; }
   .champ-role { font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); }
   .you-badge { font-size: 0.6rem; background: var(--gold-dim); color: var(--blue-dark); padding: 2px 5px; border-radius: 1px; font-family: 'Cinzel', serif; }
 
@@ -349,7 +349,7 @@
     display: flex; align-items: center; justify-content: center;
   }
 
-  .item-name { font-size: 0.65rem; color: var(--text-main); line-height: 1.2; }
+  .item-name { font-size: 0.65rem; color: #FFFFFF; line-height: 1.2; }
 
   .item-tag-badge {
     font-size: 0.56rem; letter-spacing: 0.08em; text-transform: uppercase;
@@ -373,8 +373,8 @@
   .threat-tag.poke { border-color: rgba(120,200,80,0.4); color: #88CC55; background: rgba(120,200,80,0.07); }
   .threat-tag.heal { border-color: rgba(255,150,50,0.4); color: #FFB060; background: rgba(255,150,50,0.07); }
 
-  .analysis-text { font-size: 0.9rem; line-height: 1.75; color: #9A9085; margin-bottom: 18px; }
-  .analysis-text strong { color: var(--text-main); }
+  .analysis-text { font-size: 0.9rem; line-height: 1.75; color: #D8D0C4; margin-bottom: 18px; }
+  .analysis-text strong { color: #FFFFFF; }
 
   .block-label { font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-dim); margin-bottom: 9px; }
 
@@ -390,7 +390,7 @@
     padding: 11px 13px 11px 26px;
     font-size: 0.84rem;
     line-height: 1.6;
-    color: #9A9085;
+    color: #D8D0C4;
     position: relative;
   }
 
@@ -408,9 +408,9 @@
   }
 
   .priority-label { font-family: 'Cinzel', serif; font-size: 0.62rem; letter-spacing: 0.18em; color: var(--blue-spirit); text-transform: uppercase; white-space: nowrap; padding-top: 2px; }
-  .priority-text { font-size: 0.92rem; font-weight: 600; color: var(--gold-light); line-height: 1.5; }
+  .priority-text { font-size: 0.92rem; font-weight: 600; color: #FFFFFF; line-height: 1.5; }
 
-  .api-notice { margin-top: 10px; font-size: 0.74rem; color: var(--text-dim); }
+  .api-notice { margin-top: 10px; font-size: 0.74rem; color: #B0A898; }
   .api-notice a { color: var(--blue-spirit); text-decoration: none; }
   .api-notice a:hover { text-decoration: underline; }
 
@@ -540,7 +540,7 @@
     </div>
     <div class="panel" style="background:rgba(200,155,60,0.02)">
       <div class="block-label">Knowledge de base (knowledge.js)</div>
-      <div style="font-size:0.82rem;color:var(--text-dim);line-height:1.7">
+      <div style="font-size:0.82rem;color:#B0A898;line-height:1.7">
         Le fichier <code style="background:rgba(200,155,60,0.1);color:var(--gold);padding:1px 5px;border-radius:2px">knowledge.js</code>
         dans ton repo GitHub contient ta base permanente (core items, règles matchups, style de jeu).
         Claude reçoit les deux — le fichier ET tes notes UI — à chaque analyse.
