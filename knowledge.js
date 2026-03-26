@@ -28,7 +28,7 @@ const SHEN_KNOWLEDGE = {
   gameplayNotes: `
 - Mon ulti (Stand United) est ma priorité numéro 1 : je dois toujours savoir quel allié protéger.
 - Je priorise l'ulti sur le carry le plus en danger, pas forcément l'ADC.
-- En lane, je joue passif et je stack mon passive (Ki Barrier) avant d'engager.
+- En lane, je joue passif et j'att mon passif (Ki Barrier) avant d'engager.
 - Je warde le flanc opposé à ma lane pour anticiper les rotations et préparer mon ulti.
 - Le bon timing d'ulti : quand un allié est en fight à 50-60% de vie, pas en urgence à 10%.
 - En teamfight : je taunt (E) le maximum d'ennemis, je garde mon ulti pour le carry qui se fait focus.
@@ -52,6 +52,7 @@ const SHEN_KNOWLEDGE = {
 - Je joue en EUW, elo approximatif Gold/Platine.
 - Je préfère un style de jeu proactif avec beaucoup de rotations via l'ulti.
 - J'essaie de toujours avoir un impact global plutôt que de rester en lane.
+- J'essaie au maximum de jouer aggro avec mon E durant la laning phase.
 `
 
 };
