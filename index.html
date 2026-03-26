@@ -414,6 +414,22 @@
   .api-notice a { color: var(--blue-spirit); text-decoration: none; }
   .api-notice a:hover { text-decoration: underline; }
 
+  .provider-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.18s;
+    letter-spacing: 0.06em;
+  }
+  .provider-btn:hover { border-color: rgba(200,155,60,0.4); color: var(--text-main); }
+  .provider-btn.active { border-color: var(--blue-spirit); color: var(--blue-spirit); background: rgba(11,196,227,0.08); }
+
   footer { text-align: center; margin-top: 48px; font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.1em; line-height: 1.8; }
   footer a { color: var(--gold-dim); text-decoration: none; }
 </style>
@@ -424,13 +440,27 @@
   <header>
     <span class="spirit-icon">🔵</span>
     <h1>SHEN · SUPPORT ADVISOR</h1>
-    <p class="subtitle">Analyse par Claude · EUW · Patch 26.6</p>
+    <p class="subtitle">Multi-AI · EUW · Patch 26.6</p>
   </header>
 
   <div class="tabs">
     <button class="tab active" onclick="switchTab('search')">🔍 Partie en direct</button>
     <button class="tab" onclick="switchTab('manual')">✍️ Draft manuelle</button>
     <button class="tab" onclick="switchTab('knowledge')">📖 Knowledge base</button>
+  </div>
+
+  <!-- Provider selector -->
+  <div class="panel" style="padding:14px 20px;margin-bottom:18px">
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <span style="font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold-dim);white-space:nowrap">Moteur d'analyse</span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="provider-btn active" data-provider="claude" onclick="selectProvider('claude')">🤖 Claude</button>
+        <button class="provider-btn" data-provider="openai" onclick="selectProvider('openai')">💬 ChatGPT</button>
+        <button class="provider-btn" data-provider="gemini" onclick="selectProvider('gemini')">✨ Gemini</button>
+        <button class="provider-btn" data-provider="local" onclick="selectProvider('local')">⚙️ Local</button>
+      </div>
+      <span id="providerStatus" style="font-size:0.75rem;color:var(--text-dim);margin-left:auto"></span>
+    </div>
   </div>
 
   <!-- Tab Search -->
@@ -482,7 +512,7 @@
         </div>
       </div>
       <div style="margin-top:16px">
-        <button class="btn-primary" onclick="analyzeManual()">GÉNÉRER LE BUILD VIA CLAUDE</button>
+        <button class="btn-primary" onclick="analyzeManual()">GÉNÉRER LE BUILD</button>
       </div>
     </div>
   </div>
@@ -540,7 +570,7 @@
       </div>
     </div>
 
-    <div class="section-title">Analyse Claude</div>
+    <div class="section-title">Analyse <span id="providerBadge" style="font-size:0.7rem;background:rgba(11,196,227,0.12);color:var(--blue-spirit);border:1px solid rgba(11,196,227,0.3);padding:2px 8px;border-radius:2px;letter-spacing:0.1em"></span></div>
     <div class="panel blue-accent">
       <div class="threat-tags" id="threatTags"></div>
       <div class="analysis-text" id="analysisText"></div>
@@ -644,7 +674,7 @@ async function fetchLiveGame() {
     const { allies, enemies, myChamp } = parseParticipants(data.participants, gameName);
     hideStatus();
     showDraft(allies, enemies, myChamp);
-    await callClaude(allies, enemies);
+    await callAnalyze(allies, enemies);
   } catch (err) {
     showError(err.message);
   } finally {
@@ -665,27 +695,56 @@ async function analyzeManual() {
   if (!enemies.length) { showError('Entre au moins un champion ennemi.'); return; }
   hideStatus();
   showDraft(allies, enemies, 'Shen');
-  await callClaude(allies, enemies);
+  await callAnalyze(allies, enemies);
 }
 
-// ── CLAUDE ────────────────────────────────────────────────────────────────────
-async function callClaude(allies, enemies) {
-  showLoading('Claude analyse la draft...');
+// ── PROVIDER ──────────────────────────────────────────────────────────────────
+let selectedProvider = 'claude';
+
+const PROVIDER_LABELS = {
+  claude: 'Claude', openai: 'ChatGPT', gemini: 'Gemini', local: 'Local'
+};
+
+const PROVIDER_LOADING = {
+  claude: 'Claude analyse la draft...',
+  openai: 'ChatGPT analyse la draft...',
+  gemini: 'Gemini analyse la draft...',
+  local:  'Analyse locale en cours...'
+};
+
+function selectProvider(p) {
+  selectedProvider = p;
+  document.querySelectorAll('.provider-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.provider === p);
+  });
+  document.getElementById('providerStatus').textContent =
+    p === 'local' ? '⚙️ Pas de clé API requise' : `Clé ${PROVIDER_LABELS[p]} requise sur Vercel`;
+}
+
+// ── ANALYZE ───────────────────────────────────────────────────────────────────
+async function callAnalyze(allies, enemies) {
+  showLoading(PROVIDER_LOADING[selectedProvider] || 'Analyse en cours...');
   const customKnowledge = document.getElementById('customKnowledge')?.value || '';
 
   try {
     const res = await fetch(`${PROXY_URL}/analyze`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ allies, enemies, customKnowledge })
+      body: JSON.stringify({ allies, enemies, customKnowledge, provider: selectedProvider })
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Erreur Claude');
+    if (!res.ok) throw new Error(data.error || 'Erreur analyse');
     hideStatus();
+
+    // Affiche le provider qui a réellement répondu
+    const usedLabel = PROVIDER_LABELS[data.providerUsed] || data.providerUsed || selectedProvider;
+    const badge = document.getElementById('providerBadge');
+    if (badge) badge.textContent = usedLabel + (data.fallbackReason ? ' (fallback)' : '');
+
     if (data.parsed) renderClaudeResult(data);
     else document.getElementById('analysisText').textContent = data.raw || '';
   } catch (err) {
-    showError('Erreur Claude : ' + err.message);
+    showError('Erreur analyse : ' + err.message);
   }
 }
 
