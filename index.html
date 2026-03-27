@@ -7,875 +7,835 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --gold: #C89B3C;
-    --gold-light: #F0E6D3;
-    --gold-dim: #785A28;
-    --blue-spirit: #0BC4E3;
-    --blue-dark: #091428;
-    --blue-mid: #0A1628;
-    --red-enemy: #E84057;
-    --green-ally: #0CBE6A;
-    --text-main: #E8DCC8;
-    --text-dim: #8A8880;
-    --border: rgba(200,155,60,0.25);
-    --panel-bg: rgba(9,20,40,0.92);
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'Rajdhani', sans-serif;
-    background: var(--blue-dark);
-    color: var(--text-main);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(11,196,227,0.08) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 40% at 80% 80%, rgba(200,155,60,0.05) 0%, transparent 50%),
-      url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30Z' fill='none' stroke='rgba(200,155,60,0.03)' stroke-width='1'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .container {
-    position: relative;
-    z-index: 1;
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 40px 24px;
-  }
-
-  header { text-align: center; margin-bottom: 40px; }
-
-  .spirit-icon {
-    font-size: 48px;
-    display: block;
-    margin-bottom: 12px;
-    filter: drop-shadow(0 0 20px rgba(11,196,227,0.6));
-    animation: pulse-spirit 3s ease-in-out infinite;
-  }
-
-  @keyframes pulse-spirit {
-    0%, 100% { filter: drop-shadow(0 0 20px rgba(11,196,227,0.6)); }
-    50% { filter: drop-shadow(0 0 35px rgba(11,196,227,0.9)); }
-  }
-
-  h1 {
-    font-family: 'Cinzel', serif;
-    font-size: clamp(1.6rem, 4vw, 2.4rem);
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    color: var(--gold-light);
-    text-shadow: 0 0 30px rgba(200,155,60,0.4);
-  }
-
-  .subtitle {
-    font-size: 0.92rem;
-    color: var(--text-dim);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    margin-top: 6px;
-  }
-
-  .panel {
-    background: var(--panel-bg);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 22px 26px;
-    margin-bottom: 18px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .panel::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  }
-
-  .panel.blue-accent::before { background: linear-gradient(90deg, transparent, var(--blue-spirit), transparent); }
-  .panel.green-accent::before { background: linear-gradient(90deg, transparent, var(--green-ally), transparent); }
-
-  .section-title {
-    font-family: 'Cinzel', serif;
-    font-size: 0.75rem;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--gold-dim);
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .section-title::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, var(--border), transparent);
-  }
-
-  .input-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
-  .input-group { flex: 1; min-width: 180px; }
-
-  label {
-    display: block;
-    font-size: 0.7rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--gold-dim);
-    margin-bottom: 7px;
-  }
-
-  input[type="text"], select, textarea {
-    width: 100%;
-    background: rgba(0,0,0,0.4);
-    border: 1px solid rgba(200,155,60,0.28);
-    border-radius: 2px;
-    color: var(--gold-light);
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 0.95rem;
-    padding: 9px 13px;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-
-  input[type="text"]:focus, select:focus, textarea:focus {
-    border-color: var(--gold);
-    box-shadow: 0 0 0 2px rgba(200,155,60,0.1);
-  }
-
-  textarea { resize: vertical; min-height: 150px; line-height: 1.65; font-size: 0.86rem; }
-  input::placeholder, textarea::placeholder { color: var(--text-dim); }
-  select option { background: var(--blue-dark); }
-
-  .btn-primary {
-    background: linear-gradient(135deg, #785A28, #C89B3C);
-    border: none;
-    color: #0A0A0A;
-    font-family: 'Cinzel', serif;
-    font-size: 0.82rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    padding: 10px 26px;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-
-  .btn-primary:hover { background: linear-gradient(135deg, #C89B3C, #F0E6D3); box-shadow: 0 0 18px rgba(200,155,60,0.4); }
-  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  .btn-secondary {
-    background: transparent;
-    border: 1px solid var(--gold-dim);
-    color: var(--gold);
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 0.86rem;
-    font-weight: 600;
-    padding: 8px 18px;
-    border-radius: 2px;
-    cursor: pointer;
-    letter-spacing: 0.08em;
-    transition: all 0.2s;
-  }
-
-  .btn-secondary:hover { background: rgba(200,155,60,0.08); border-color: var(--gold); }
-
-  .btn-link {
-    background: none;
-    border: none;
-    color: var(--blue-spirit);
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 0.82rem;
-    cursor: pointer;
-    padding: 0;
-  }
-
-  .btn-link:hover { text-decoration: underline; }
-
-  /* Tabs */
-  .tabs { display: flex; gap: 4px; margin-bottom: 18px; }
-
-  .tab {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 8px 16px;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .tab.active { border-color: var(--gold); color: var(--gold); background: rgba(200,155,60,0.08); }
-  .tab:hover:not(.active) { border-color: rgba(200,155,60,0.4); color: var(--text-main); }
-
-  /* Knowledge */
-  .knowledge-hint { font-size: 0.78rem; color: #B0A898; margin-bottom: 12px; line-height: 1.65; }
-  .knowledge-hint code { background: rgba(200,155,60,0.1); color: var(--gold); padding: 1px 5px; border-radius: 2px; }
-
-  .save-badge { font-size: 0.7rem; color: var(--green-ally); display: none; animation: fadeout 2.2s forwards; }
-  @keyframes fadeout { 0%,70%{opacity:1} 100%{opacity:0} }
-
-  /* Role inputs */
-  .role-input-row {
-    display: grid;
-    grid-template-columns: 76px 1fr;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-
-  .role-badge { font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); text-align: right; }
-
-  /* Status */
-  .status-bar {
-    text-align: center;
-    padding: 13px 18px;
-    border-radius: 3px;
-    font-size: 0.88rem;
-    margin-bottom: 18px;
-    display: none;
-  }
-
-  .status-bar.loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    border: 1px solid rgba(11,196,227,0.3);
-    color: var(--blue-spirit);
-    background: rgba(11,196,227,0.05);
-  }
-
-  .status-bar.error {
-    display: block;
-    border: 1px solid rgba(232,64,87,0.3);
-    color: var(--red-enemy);
-    background: rgba(232,64,87,0.05);
-  }
-
-  .spinner {
-    width: 15px; height: 15px;
-    border: 2px solid rgba(11,196,227,0.2);
-    border-top-color: var(--blue-spirit);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    flex-shrink: 0;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* Draft */
-  .draft-section { display: none; }
-  .draft-section.visible { display: block; }
-
-  .teams-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
-  @media (max-width: 600px) { .teams-grid { grid-template-columns: 1fr; } }
-
-  .team-panel {
-    background: var(--panel-bg);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 16px 18px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .team-panel.ally { border-color: rgba(12,190,106,0.25); }
-  .team-panel.enemy { border-color: rgba(232,64,87,0.25); }
-  .team-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
-  .team-panel.ally::before { background: linear-gradient(90deg, transparent, var(--green-ally), transparent); }
-  .team-panel.enemy::before { background: linear-gradient(90deg, transparent, var(--red-enemy), transparent); }
-
-  .team-label { font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 11px; }
-  .ally .team-label { color: var(--green-ally); }
-  .enemy .team-label { color: var(--red-enemy); }
-
-  .champion-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-
-  .champion-item {
-    display: flex; align-items: center; gap: 9px;
-    padding: 5px 9px; border-radius: 2px; background: rgba(0,0,0,0.2);
-  }
-
-  .champion-item.is-me { background: rgba(200,155,60,0.1); border: 1px solid rgba(200,155,60,0.28); }
-  .champ-icon { width: 32px; height: 32px; border-radius: 50%; border: 2px solid rgba(200,155,60,0.22); object-fit: cover; flex-shrink: 0; background: var(--blue-mid); }
-  .champ-icon.is-me { border-color: var(--gold); }
-  .champ-name { font-size: 0.9rem; font-weight: 600; color: #FFFFFF; }
-  .champ-role { font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); }
-  .you-badge { font-size: 0.6rem; background: var(--gold-dim); color: var(--blue-dark); padding: 2px 5px; border-radius: 1px; font-family: 'Cinzel', serif; }
-
-  /* Build */
-  .items-row { display: flex; gap: 9px; flex-wrap: wrap; margin-bottom: 20px; align-items: flex-start; }
-
-  .item-card { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 74px; text-align: center; }
-  .item-icon-wrap { position: relative; width: 52px; height: 52px; }
-
-  .item-icon {
-    width: 52px; height: 52px;
-    border-radius: 4px;
-    border: 2px solid var(--gold-dim);
-    object-fit: cover;
-    background: var(--blue-mid);
-  }
-
-  .item-icon.core { border-color: var(--gold); box-shadow: 0 0 10px rgba(200,155,60,0.28); }
-  .item-icon.situational { border-color: var(--blue-spirit); }
-  .item-icon.boots { border-color: #777; }
-
-  .item-order {
-    position: absolute; top: -5px; left: -5px;
-    width: 16px; height: 16px;
-    background: var(--blue-dark);
-    border: 1px solid var(--gold);
-    border-radius: 50%;
-    font-size: 0.6rem; font-weight: 700; color: var(--gold);
-    display: flex; align-items: center; justify-content: center;
-  }
-
-  .item-name { font-size: 0.65rem; color: #FFFFFF; line-height: 1.2; }
-
-  .item-tag-badge {
-    font-size: 0.56rem; letter-spacing: 0.08em; text-transform: uppercase;
-    padding: 1px 4px; border-radius: 1px;
-  }
-
-  .tag-core { background: rgba(200,155,60,0.12); color: var(--gold); }
-  .tag-situational { background: rgba(11,196,227,0.1); color: var(--blue-spirit); }
-  .tag-boots { background: rgba(92,91,87,0.2); color: var(--text-dim); }
-
-  .separator { width: 1px; height: 52px; background: linear-gradient(180deg, transparent, var(--border), transparent); margin: 0 2px; align-self: flex-start; margin-top: 13px; }
-
-  /* Threat tags */
-  .threat-tags { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 14px; }
-
-  .threat-tag { font-size: 0.73rem; padding: 3px 9px; border-radius: 2px; border: 1px solid; }
-  .threat-tag.ad { border-color: rgba(232,64,87,0.4); color: #FF6B7A; background: rgba(232,64,87,0.07); }
-  .threat-tag.ap { border-color: rgba(100,120,255,0.4); color: #8899FF; background: rgba(100,120,255,0.07); }
-  .threat-tag.mixed { border-color: rgba(200,155,60,0.4); color: var(--gold); background: rgba(200,155,60,0.07); }
-  .threat-tag.engage { border-color: rgba(11,196,227,0.4); color: var(--blue-spirit); background: rgba(11,196,227,0.07); }
-  .threat-tag.poke { border-color: rgba(120,200,80,0.4); color: #88CC55; background: rgba(120,200,80,0.07); }
-  .threat-tag.heal { border-color: rgba(255,150,50,0.4); color: #FFB060; background: rgba(255,150,50,0.07); }
-
-  .analysis-text { font-size: 0.9rem; line-height: 1.75; color: #D8D0C4; margin-bottom: 18px; }
-  .analysis-text strong { color: #FFFFFF; }
-
-  .block-label { font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-dim); margin-bottom: 9px; }
-
-  .item-reasoning-block { border-top: 1px solid var(--border); padding-top: 16px; margin-bottom: 16px; }
-
-  .tips-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
-  @media (max-width: 600px) { .tips-grid { grid-template-columns: 1fr; } }
-
-  .tip-card {
-    background: rgba(0,0,0,0.22);
-    border: 1px solid rgba(200,155,60,0.1);
-    border-radius: 3px;
-    padding: 11px 13px 11px 26px;
-    font-size: 0.84rem;
-    line-height: 1.6;
-    color: #D8D0C4;
-    position: relative;
-  }
-
-  .tip-card::before { content: '›'; position: absolute; left: 11px; top: 10px; color: var(--gold-dim); font-size: 1rem; }
-
-  .priority-block {
-    background: rgba(11,196,227,0.05);
-    border: 1px solid rgba(11,196,227,0.22);
-    border-radius: 3px;
-    padding: 12px 16px;
-    margin-top: 10px;
-    display: none;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .priority-label { font-family: 'Cinzel', serif; font-size: 0.62rem; letter-spacing: 0.18em; color: var(--blue-spirit); text-transform: uppercase; white-space: nowrap; padding-top: 2px; }
-  .priority-text { font-size: 0.92rem; font-weight: 600; color: #FFFFFF; line-height: 1.5; }
-
-  .api-notice { margin-top: 10px; font-size: 0.74rem; color: #B0A898; }
-  .api-notice a { color: var(--blue-spirit); text-decoration: none; }
-  .api-notice a:hover { text-decoration: underline; }
-
-  .provider-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 0.8rem;
-    font-weight: 600;
-    padding: 6px 14px;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: all 0.18s;
-    letter-spacing: 0.06em;
-  }
-  .provider-btn:hover { border-color: rgba(200,155,60,0.4); color: var(--text-main); }
-  .provider-btn.active { border-color: var(--blue-spirit); color: var(--blue-spirit); background: rgba(11,196,227,0.08); }
-
-  footer { text-align: center; margin-top: 48px; font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.1em; line-height: 1.8; }
-  footer a { color: var(--gold-dim); text-decoration: none; }
+:root {
+  --gold:#C89B3C; --gold-light:#F0E6D3; --gold-dim:#785A28;
+  --blue-spirit:#0BC4E3; --blue-dark:#091428; --blue-mid:#0A1628;
+  --red-enemy:#E84057; --green-ally:#0CBE6A;
+  --text-main:#E8DCC8; --text-dim:#8A8880;
+  --border:rgba(200,155,60,0.25); --panel-bg:rgba(9,20,40,0.92);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Rajdhani',sans-serif;background:var(--blue-dark);color:var(--text-main);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(11,196,227,0.08) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 80% 80%,rgba(200,155,60,0.05) 0%,transparent 50%);pointer-events:none;z-index:0;}
+.container{position:relative;z-index:1;max-width:1060px;margin:0 auto;padding:36px 20px;}
+header{text-align:center;margin-bottom:36px;}
+.spirit-icon{font-size:44px;display:block;margin-bottom:10px;filter:drop-shadow(0 0 20px rgba(11,196,227,0.6));animation:pulse 3s ease-in-out infinite;}
+@keyframes pulse{0%,100%{filter:drop-shadow(0 0 20px rgba(11,196,227,0.6))}50%{filter:drop-shadow(0 0 35px rgba(11,196,227,0.9))}}
+h1{font-family:'Cinzel',serif;font-size:clamp(1.5rem,4vw,2.2rem);font-weight:700;letter-spacing:0.12em;color:var(--gold-light);text-shadow:0 0 30px rgba(200,155,60,0.4);}
+.subtitle{font-size:0.88rem;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;margin-top:5px;}
+.patch-badge{display:inline-block;margin-left:8px;font-size:0.7rem;background:rgba(11,196,227,0.1);border:1px solid rgba(11,196,227,0.3);color:var(--blue-spirit);padding:1px 7px;border-radius:2px;vertical-align:middle;}
+
+/* PANELS */
+.panel{background:var(--panel-bg);border:1px solid var(--border);border-radius:4px;padding:20px 24px;margin-bottom:16px;position:relative;overflow:hidden;}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.panel.blue-accent::before{background:linear-gradient(90deg,transparent,var(--blue-spirit),transparent);}
+.panel.green-accent::before{background:linear-gradient(90deg,transparent,var(--green-ally),transparent);}
+.panel.red-accent::before{background:linear-gradient(90deg,transparent,var(--red-enemy),transparent);}
+
+/* TABS */
+.tabs{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap;}
+.tab{background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:'Rajdhani',sans-serif;font-size:0.78rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:7px 14px;border-radius:2px;cursor:pointer;transition:all 0.18s;}
+.tab.active{border-color:var(--gold);color:var(--gold);background:rgba(200,155,60,0.08);}
+.tab:hover:not(.active){border-color:rgba(200,155,60,0.4);color:var(--text-main);}
+.tab-content{display:none;}.tab-content.active{display:block;}
+
+/* PROVIDER BAR */
+.provider-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 18px;}
+.provider-label{font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold-dim);white-space:nowrap;}
+.provider-btns{display:flex;gap:5px;flex-wrap:wrap;}
+.pbtn{background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:'Rajdhani',sans-serif;font-size:0.78rem;font-weight:600;padding:5px 13px;border-radius:2px;cursor:pointer;transition:all 0.18s;letter-spacing:0.05em;}
+.pbtn:hover{border-color:rgba(200,155,60,0.4);color:var(--text-main);}
+.pbtn.active{border-color:var(--blue-spirit);color:var(--blue-spirit);background:rgba(11,196,227,0.08);}
+#providerStatus{font-size:0.72rem;color:var(--text-dim);margin-left:auto;}
+
+/* INPUTS */
+.input-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;}
+.input-group{flex:1;min-width:160px;}
+label{display:block;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:6px;}
+input[type=text],select,textarea{width:100%;background:rgba(0,0,0,0.4);border:1px solid rgba(200,155,60,0.28);border-radius:2px;color:var(--gold-light);font-family:'Rajdhani',sans-serif;font-size:0.92rem;padding:8px 12px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;}
+input[type=text]:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(200,155,60,0.1);}
+textarea{resize:vertical;min-height:140px;line-height:1.65;font-size:0.84rem;}
+input::placeholder,textarea::placeholder{color:var(--text-dim);}
+select option{background:var(--blue-dark);}
+
+/* BUTTONS */
+.btn-primary{background:linear-gradient(135deg,#785A28,#C89B3C);border:none;color:#0A0A0A;font-family:'Cinzel',serif;font-size:0.8rem;font-weight:700;letter-spacing:0.1em;padding:9px 22px;border-radius:2px;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.btn-primary:hover{background:linear-gradient(135deg,#C89B3C,#F0E6D3);box-shadow:0 0 18px rgba(200,155,60,0.4);}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed;}
+.btn-secondary{background:transparent;border:1px solid var(--gold-dim);color:var(--gold);font-family:'Rajdhani',sans-serif;font-size:0.84rem;font-weight:600;padding:7px 16px;border-radius:2px;cursor:pointer;letter-spacing:0.08em;transition:all 0.2s;}
+.btn-secondary:hover{background:rgba(200,155,60,0.08);border-color:var(--gold);}
+.btn-link{background:none;border:none;color:var(--blue-spirit);font-family:'Rajdhani',sans-serif;font-size:0.8rem;cursor:pointer;padding:0;}
+.btn-link:hover{text-decoration:underline;}
+
+/* SECTION TITLES */
+.section-title{font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+.block-label{font-size:0.66rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:8px;}
+
+/* STATUS */
+.status-bar{text-align:center;padding:12px 16px;border-radius:3px;font-size:0.86rem;margin-bottom:16px;display:none;}
+.status-bar.loading{display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid rgba(11,196,227,0.3);color:var(--blue-spirit);background:rgba(11,196,227,0.05);}
+.status-bar.error{display:block;border:1px solid rgba(232,64,87,0.3);color:var(--red-enemy);background:rgba(232,64,87,0.05);}
+.spinner{width:14px;height:14px;border:2px solid rgba(11,196,227,0.2);border-top-color:var(--blue-spirit);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* DRAFT */
+.draft-section{display:none;}.draft-section.visible{display:block;}
+.teams-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+@media(max-width:600px){.teams-grid{grid-template-columns:1fr;}}
+.team-panel{background:var(--panel-bg);border:1px solid var(--border);border-radius:4px;padding:14px 16px;position:relative;overflow:hidden;}
+.team-panel.ally{border-color:rgba(12,190,106,0.25);}
+.team-panel.enemy{border-color:rgba(232,64,87,0.25);}
+.team-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.team-panel.ally::before{background:linear-gradient(90deg,transparent,var(--green-ally),transparent);}
+.team-panel.enemy::before{background:linear-gradient(90deg,transparent,var(--red-enemy),transparent);}
+.team-label{font-family:'Cinzel',serif;font-size:0.66rem;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:10px;}
+.ally .team-label{color:var(--green-ally);}.enemy .team-label{color:var(--red-enemy);}
+.champion-list{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.champion-item{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:2px;background:rgba(0,0,0,0.2);cursor:pointer;transition:all 0.15s;}
+.champion-item:hover{background:rgba(0,0,0,0.35);}
+.champion-item.is-me{background:rgba(200,155,60,0.1);border:1px solid rgba(200,155,60,0.28);}
+.champion-item.is-priority{background:rgba(232,64,87,0.12);border:1px solid rgba(232,64,87,0.4);}
+.champ-icon{width:30px;height:30px;border-radius:50%;border:2px solid rgba(200,155,60,0.22);object-fit:cover;flex-shrink:0;background:var(--blue-mid);}
+.champ-icon.is-me{border-color:var(--gold);}
+.champ-icon.is-priority{border-color:var(--red-enemy);}
+.champ-name{font-size:0.88rem;font-weight:600;color:#FFF;}
+.champ-role{font-size:0.64rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);}
+.you-badge{font-size:0.58rem;background:var(--gold-dim);color:var(--blue-dark);padding:1px 5px;border-radius:1px;font-family:'Cinzel',serif;}
+.priority-badge{font-size:0.58rem;background:rgba(232,64,87,0.8);color:#FFF;padding:1px 5px;border-radius:1px;font-family:'Cinzel',serif;}
+.priority-hint{font-size:0.72rem;color:var(--text-dim);margin-top:8px;font-style:italic;}
+
+/* COMPARISON LAYOUT */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:700px){.compare-grid{grid-template-columns:1fr;}}
+.compare-col{position:relative;}
+.compare-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.compare-provider-tag{font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;padding:3px 9px;border-radius:2px;border:1px solid;}
+.compare-provider-tag.claude{border-color:rgba(200,155,60,0.5);color:var(--gold);background:rgba(200,155,60,0.08);}
+.compare-provider-tag.openai{border-color:rgba(120,200,120,0.5);color:#88EE88;background:rgba(120,200,120,0.06);}
+.compare-provider-tag.gemini{border-color:rgba(100,150,255,0.5);color:#88AAFF;background:rgba(100,150,255,0.06);}
+.compare-provider-tag.local{border-color:var(--border);color:var(--text-dim);}
+
+/* BUILD ITEMS */
+.items-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;align-items:flex-start;}
+.item-card{display:flex;flex-direction:column;align-items:center;gap:4px;width:70px;text-align:center;}
+.item-icon-wrap{position:relative;width:50px;height:50px;}
+.item-icon{width:50px;height:50px;border-radius:4px;border:2px solid var(--gold-dim);object-fit:cover;background:var(--blue-mid);}
+.item-icon.core{border-color:var(--gold);box-shadow:0 0 10px rgba(200,155,60,0.28);}
+.item-icon.situational{border-color:var(--blue-spirit);}
+.item-icon.boots{border-color:#888;}
+.item-order{position:absolute;top:-5px;left:-5px;width:16px;height:16px;background:var(--blue-dark);border:1px solid var(--gold);border-radius:50%;font-size:0.58rem;font-weight:700;color:var(--gold);display:flex;align-items:center;justify-content:center;}
+.item-name{font-size:0.62rem;color:#FFF;line-height:1.2;}
+.item-tag-badge{font-size:0.54rem;letter-spacing:0.08em;text-transform:uppercase;padding:1px 4px;border-radius:1px;}
+.tag-core{background:rgba(200,155,60,0.12);color:var(--gold);}
+.tag-situational{background:rgba(11,196,227,0.1);color:var(--blue-spirit);}
+.tag-boots{background:rgba(92,91,87,0.2);color:var(--text-dim);}
+.separator{width:1px;height:50px;background:linear-gradient(180deg,transparent,var(--border),transparent);margin:0 2px;align-self:flex-start;margin-top:12px;}
+
+/* THREAT TAGS */
+.threat-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.threat-tag{font-size:0.7rem;padding:3px 8px;border-radius:2px;border:1px solid;}
+.threat-tag.ad{border-color:rgba(232,64,87,0.4);color:#FF6B7A;background:rgba(232,64,87,0.07);}
+.threat-tag.ap{border-color:rgba(100,120,255,0.4);color:#8899FF;background:rgba(100,120,255,0.07);}
+.threat-tag.mixed{border-color:rgba(200,155,60,0.4);color:var(--gold);background:rgba(200,155,60,0.07);}
+.threat-tag.engage{border-color:rgba(11,196,227,0.4);color:var(--blue-spirit);background:rgba(11,196,227,0.07);}
+.threat-tag.poke{border-color:rgba(120,200,80,0.4);color:#88CC55;background:rgba(120,200,80,0.07);}
+.threat-tag.heal{border-color:rgba(255,150,50,0.4);color:#FFB060;background:rgba(255,150,50,0.07);}
+
+/* TEXT */
+.analysis-text{font-size:0.88rem;line-height:1.75;color:#D8D0C4;margin-bottom:16px;}
+.analysis-text strong{color:#FFF;}
+.item-reasoning-block{border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px;}
+.tips-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+@media(max-width:600px){.tips-grid{grid-template-columns:1fr;}}
+.tip-card{background:rgba(0,0,0,0.22);border:1px solid rgba(200,155,60,0.1);border-radius:3px;padding:10px 12px 10px 24px;font-size:0.82rem;line-height:1.6;color:#D8D0C4;position:relative;}
+.tip-card::before{content:'›';position:absolute;left:10px;top:9px;color:var(--gold-dim);font-size:1rem;}
+.priority-block{background:rgba(11,196,227,0.05);border:1px solid rgba(11,196,227,0.22);border-radius:3px;padding:11px 14px;margin-top:10px;display:none;align-items:flex-start;gap:10px;}
+.priority-label{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.18em;color:var(--blue-spirit);text-transform:uppercase;white-space:nowrap;padding-top:2px;}
+.priority-text{font-size:0.9rem;font-weight:600;color:#FFF;line-height:1.5;}
+
+/* PRIORITY ENEMY WARNING */
+.priority-enemy-alert{background:rgba(232,64,87,0.08);border:1px solid rgba(232,64,87,0.35);border-radius:3px;padding:10px 14px;margin-bottom:14px;display:none;align-items:center;gap:10px;font-size:0.86rem;color:#FF8090;}
+.priority-enemy-alert strong{color:var(--red-enemy);}
+
+/* ACTION ROW */
+.action-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+
+/* HISTORY */
+.history-empty{text-align:center;color:var(--text-dim);font-size:0.88rem;padding:32px 0;}
+.history-list{display:flex;flex-direction:column;gap:10px;}
+.history-card{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:3px;padding:14px 16px;cursor:pointer;transition:all 0.18s;position:relative;}
+.history-card:hover{border-color:rgba(200,155,60,0.5);background:rgba(0,0,0,0.45);}
+.history-card-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.history-date{font-size:0.68rem;color:var(--text-dim);letter-spacing:0.08em;}
+.history-provider{font-size:0.62rem;padding:1px 6px;border-radius:1px;border:1px solid var(--border);color:var(--text-dim);}
+.history-champs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;}
+.history-champ-icon{width:24px;height:24px;border-radius:50%;border:1px solid rgba(200,155,60,0.2);object-fit:cover;background:var(--blue-mid);}
+.history-champ-icon.enemy{border-color:rgba(232,64,87,0.3);}
+.history-build-preview{font-size:0.75rem;color:var(--text-dim);}
+.history-priority-tag{font-size:0.62rem;background:rgba(232,64,87,0.15);border:1px solid rgba(232,64,87,0.3);color:#FF6B7A;padding:1px 6px;border-radius:1px;margin-left:auto;}
+.history-delete{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:0.9rem;opacity:0.5;transition:opacity 0.2s;}
+.history-delete:hover{opacity:1;color:var(--red-enemy);}
+.history-count{font-size:0.72rem;color:var(--text-dim);margin-left:auto;}
+
+/* KNOWLEDGE */
+.knowledge-hint{font-size:0.76rem;color:#B0A898;margin-bottom:10px;line-height:1.65;}
+.knowledge-hint code{background:rgba(200,155,60,0.1);color:var(--gold);padding:1px 5px;border-radius:2px;}
+.save-badge{font-size:0.68rem;color:var(--green-ally);display:none;animation:fadeout 2.2s forwards;}
+@keyframes fadeout{0%,70%{opacity:1}100%{opacity:0}}
+
+/* ROLE INPUTS */
+.role-input-row{display:grid;grid-template-columns:72px 1fr;gap:8px;align-items:center;margin-bottom:7px;}
+.role-badge{font-size:0.66rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);text-align:right;}
+
+/* API NOTICE */
+.api-notice{margin-top:9px;font-size:0.72rem;color:#B0A898;}
+.api-notice a{color:var(--blue-spirit);text-decoration:none;}
+.api-notice a:hover{text-decoration:underline;}
+
+footer{text-align:center;margin-top:44px;font-size:0.68rem;color:var(--text-dim);letter-spacing:0.1em;line-height:1.8;}
+footer a{color:var(--gold-dim);text-decoration:none;}
 </style>
 </head>
 <body>
 <div class="container">
 
-  <header>
-    <span class="spirit-icon">🔵</span>
-    <h1>SHEN · SUPPORT ADVISOR</h1>
-    <p class="subtitle">Multi-AI · EUW · Patch 26.6</p>
-  </header>
+<header>
+  <span class="spirit-icon">🔵</span>
+  <h1>SHEN · SUPPORT ADVISOR</h1>
+  <p class="subtitle">Multi-AI · EUW <span class="patch-badge" id="patchBadge">...</span></p>
+</header>
 
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('search')">🔍 Partie en direct</button>
-    <button class="tab" onclick="switchTab('manual')">✍️ Draft manuelle</button>
-    <button class="tab" onclick="switchTab('knowledge')">📖 Knowledge base</button>
-  </div>
+<!-- Navigation -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('search')">🔍 Partie en direct</button>
+  <button class="tab" onclick="switchTab('manual')">✍️ Draft manuelle</button>
+  <button class="tab" onclick="switchTab('knowledge')">📖 Knowledge base</button>
+  <button class="tab" onclick="switchTab('history')">🕘 Historique <span id="historyCount" style="font-size:0.65rem;opacity:0.6"></span></button>
+</div>
 
-  <!-- Provider selector -->
-  <div class="panel" style="padding:14px 20px;margin-bottom:18px">
-    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-      <span style="font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold-dim);white-space:nowrap">Moteur d'analyse</span>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="provider-btn active" data-provider="claude" onclick="selectProvider('claude')">🤖 Claude</button>
-        <button class="provider-btn" data-provider="openai" onclick="selectProvider('openai')">💬 ChatGPT</button>
-        <button class="provider-btn" data-provider="gemini" onclick="selectProvider('gemini')">✨ Gemini</button>
-        <button class="provider-btn" data-provider="local" onclick="selectProvider('local')">⚙️ Local</button>
-      </div>
-      <span id="providerStatus" style="font-size:0.75rem;color:var(--text-dim);margin-left:auto"></span>
+<!-- Provider bar (always visible) -->
+<div class="panel" style="padding:0;margin-bottom:16px;">
+  <div class="provider-bar">
+    <span class="provider-label">Moteur</span>
+    <div class="provider-btns">
+      <button class="pbtn active" data-p="claude"  onclick="selectProvider('claude')">🤖 Claude</button>
+      <button class="pbtn"        data-p="openai"  onclick="selectProvider('openai')">💬 ChatGPT</button>
+      <button class="pbtn"        data-p="gemini"  onclick="selectProvider('gemini')">✨ Gemini</button>
+      <button class="pbtn"        data-p="local"   onclick="selectProvider('local')">⚙️ Local</button>
     </div>
+    <span id="providerStatus" style="font-size:0.7rem;color:var(--text-dim);margin-left:auto;"></span>
   </div>
+</div>
 
-  <!-- Tab Search -->
-  <div id="tab-search">
-    <div class="panel">
-      <div class="input-row">
-        <div class="input-group">
-          <label>Riot ID</label>
-          <input type="text" id="riotId" placeholder="Pseudo#EUW1">
-        </div>
-        <div class="input-group" style="max-width:108px">
-          <label>Région</label>
-          <select id="region">
-            <option value="euw1">EUW</option>
-            <option value="eun1">EUNE</option>
-            <option value="na1">NA</option>
-            <option value="kr">KR</option>
-            <option value="br1">BR</option>
-          </select>
-        </div>
-        <button class="btn-primary" id="searchBtn" onclick="fetchLiveGame()">ANALYSER</button>
+<!-- Tab: Search -->
+<div id="tab-search" class="tab-content active">
+  <div class="panel">
+    <div class="input-row">
+      <div class="input-group">
+        <label>Riot ID</label>
+        <input type="text" id="riotId" placeholder="Pseudo#EUW1">
       </div>
-      <div class="api-notice">
-        Proxy Riot sécurisé · Analyse via Claude ·
-        <a href="https://developer.riotgames.com" target="_blank">Riot Dev Portal</a>
+      <div class="input-group" style="max-width:106px">
+        <label>Région</label>
+        <select id="region">
+          <option value="euw1">EUW</option>
+          <option value="eun1">EUNE</option>
+          <option value="na1">NA</option>
+          <option value="kr">KR</option>
+          <option value="br1">BR</option>
+        </select>
+      </div>
+      <button class="btn-primary" id="searchBtn" onclick="fetchLiveGame()">ANALYSER</button>
+    </div>
+    <div class="api-notice">Proxy Riot sécurisé · Fallback auto entre providers · <a href="https://developer.riotgames.com" target="_blank">Riot Dev Portal</a></div>
+  </div>
+</div>
+
+<!-- Tab: Manual -->
+<div id="tab-manual" class="tab-content">
+  <div class="panel">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div>
+        <div style="font-size:0.68rem;letter-spacing:0.15em;color:var(--green-ally);margin-bottom:9px;text-transform:uppercase">⚔️ Alliés</div>
+        <div class="role-input-row"><span class="role-badge">Top</span>    <input type="text" placeholder="Champion top"    id="ally0"></div>
+        <div class="role-input-row"><span class="role-badge">Jungle</span> <input type="text" placeholder="Champion jungle" id="ally1"></div>
+        <div class="role-input-row"><span class="role-badge">Mid</span>    <input type="text" placeholder="Champion mid"    id="ally2"></div>
+        <div class="role-input-row"><span class="role-badge">ADC</span>    <input type="text" placeholder="Champion ADC"    id="ally3"></div>
+        <div class="role-input-row"><span class="role-badge">Support</span><input type="text" value="Shen" disabled style="opacity:0.4"></div>
+      </div>
+      <div>
+        <div style="font-size:0.68rem;letter-spacing:0.15em;color:var(--red-enemy);margin-bottom:9px;text-transform:uppercase">💀 Ennemis</div>
+        <div class="role-input-row"><span class="role-badge">Top</span>    <input type="text" placeholder="Champion top"    id="enemy0"></div>
+        <div class="role-input-row"><span class="role-badge">Jungle</span> <input type="text" placeholder="Champion jungle" id="enemy1"></div>
+        <div class="role-input-row"><span class="role-badge">Mid</span>    <input type="text" placeholder="Champion mid"    id="enemy2"></div>
+        <div class="role-input-row"><span class="role-badge">ADC</span>    <input type="text" placeholder="Champion ADC"    id="enemy3"></div>
+        <div class="role-input-row"><span class="role-badge">Support</span><input type="text" placeholder="Champion support" id="enemy4"></div>
       </div>
     </div>
-  </div>
-
-  <!-- Tab Manual -->
-  <div id="tab-manual" style="display:none">
-    <div class="panel">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px">
-        <div>
-          <div style="font-size:0.7rem;letter-spacing:0.15em;color:var(--green-ally);margin-bottom:10px;text-transform:uppercase">⚔️ Alliés</div>
-          <div class="role-input-row"><span class="role-badge">Top</span><input type="text" placeholder="Champion top" id="ally0"></div>
-          <div class="role-input-row"><span class="role-badge">Jungle</span><input type="text" placeholder="Champion jungle" id="ally1"></div>
-          <div class="role-input-row"><span class="role-badge">Mid</span><input type="text" placeholder="Champion mid" id="ally2"></div>
-          <div class="role-input-row"><span class="role-badge">ADC</span><input type="text" placeholder="Champion ADC" id="ally3"></div>
-          <div class="role-input-row"><span class="role-badge">Support</span><input type="text" value="Shen" disabled style="opacity:0.4"></div>
-        </div>
-        <div>
-          <div style="font-size:0.7rem;letter-spacing:0.15em;color:var(--red-enemy);margin-bottom:10px;text-transform:uppercase">💀 Ennemis</div>
-          <div class="role-input-row"><span class="role-badge">Top</span><input type="text" placeholder="Champion top" id="enemy0"></div>
-          <div class="role-input-row"><span class="role-badge">Jungle</span><input type="text" placeholder="Champion jungle" id="enemy1"></div>
-          <div class="role-input-row"><span class="role-badge">Mid</span><input type="text" placeholder="Champion mid" id="enemy2"></div>
-          <div class="role-input-row"><span class="role-badge">ADC</span><input type="text" placeholder="Champion ADC" id="enemy3"></div>
-          <div class="role-input-row"><span class="role-badge">Support</span><input type="text" placeholder="Champion support" id="enemy4"></div>
-        </div>
-      </div>
-      <div style="margin-top:16px">
-        <button class="btn-primary" onclick="analyzeManual()">GÉNÉRER LE BUILD</button>
-      </div>
+    <div style="margin-top:14px">
+      <button class="btn-primary" onclick="analyzeManual()">GÉNÉRER LE BUILD</button>
     </div>
   </div>
+</div>
 
-  <!-- Tab Knowledge -->
-  <div id="tab-knowledge" style="display:none">
-    <div class="panel green-accent">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <div class="section-title" style="margin:0">📖 Mes notes personnelles</div>
-        <span class="save-badge" id="saveBadge">✓ Sauvegardé</span>
-      </div>
-      <div class="knowledge-hint">
-        Ces notes sont envoyées à Claude à chaque analyse, en plus du fichier <code>knowledge.js</code> du repo.
-        Écris en langage naturel : règles de matchups, préférences, style de jeu. Auto-sauvegardé dans ton navigateur.
-      </div>
-      <textarea id="customKnowledge" placeholder="Exemples :
-- Contre Vayne, je prends Gargoyle en 3ème item systématiquement
-- Si mon ADC est Jinx ou Kog'Maw, Vœu du Chevalier est obligatoire
-- Je joue très roam, je ne reste jamais coller ma lane
-- Contre Zed : je garde mon ulti pour contrer son ulti sur mon carry..."></textarea>
-      <div style="margin-top:10px;display:flex;gap:10px;align-items:center">
-        <button class="btn-secondary" onclick="saveKnowledge()">Sauvegarder</button>
-        <button class="btn-link" onclick="clearKnowledge()">Effacer</button>
-      </div>
+<!-- Tab: Knowledge -->
+<div id="tab-knowledge" class="tab-content">
+  <div class="panel green-accent">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px">
+      <div class="section-title" style="margin:0">📖 Mes notes personnelles</div>
+      <span class="save-badge" id="saveBadge">✓ Sauvegardé</span>
     </div>
-    <div class="panel" style="background:rgba(200,155,60,0.02)">
-      <div class="block-label">Knowledge de base (knowledge.js)</div>
-      <div style="font-size:0.82rem;color:#B0A898;line-height:1.7">
-        Le fichier <code style="background:rgba(200,155,60,0.1);color:var(--gold);padding:1px 5px;border-radius:2px">knowledge.js</code>
-        dans ton repo GitHub contient ta base permanente (core items, règles matchups, style de jeu).
-        Claude reçoit les deux — le fichier ET tes notes UI — à chaque analyse.
-        Édite <code style="background:rgba(200,155,60,0.1);color:var(--gold);padding:1px 5px;border-radius:2px">knowledge.js</code> pour des règles durables qui survivent aux changements de navigateur.
-      </div>
+    <div class="knowledge-hint">Ces notes + le fichier <code>knowledge.js</code> sont envoyés à toutes les IA à chaque analyse. Auto-sauvegardé dans ton navigateur.</div>
+    <textarea id="customKnowledge" placeholder="Ex: Contre Vayne je prends Gargoyle en 3ème..."></textarea>
+    <div style="margin-top:9px;display:flex;gap:9px;align-items:center">
+      <button class="btn-secondary" onclick="saveKnowledge()">Sauvegarder</button>
+      <button class="btn-link" onclick="clearKnowledge()">Effacer</button>
+    </div>
+  </div>
+  <div class="panel" style="background:rgba(200,155,60,0.02)">
+    <div class="block-label">Knowledge de base (knowledge.js)</div>
+    <div style="font-size:0.8rem;color:#B0A898;line-height:1.7">
+      Édite <code style="background:rgba(200,155,60,0.1);color:var(--gold);padding:1px 5px;border-radius:2px">knowledge.js</code>
+      dans ton repo GitHub pour des règles permanentes. Les notes UI + le fichier sont fusionnés et envoyés à toutes les IA.
+    </div>
+  </div>
+</div>
+
+<!-- Tab: History -->
+<div id="tab-history" class="tab-content">
+  <div class="panel" style="padding:14px 20px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <div class="section-title" style="margin:0;flex:1">🕘 Historique des analyses</div>
+      <span class="history-count" id="historyCountLabel"></span>
+      <button class="btn-link" onclick="clearHistory()" style="color:var(--red-enemy);font-size:0.75rem">Tout effacer</button>
+    </div>
+    <div id="historyList"></div>
+  </div>
+</div>
+
+<!-- Status -->
+<div class="status-bar" id="statusBar">
+  <div class="spinner"></div>
+  <span id="statusText">Analyse en cours...</span>
+</div>
+
+<!-- Draft + Results -->
+<div class="draft-section" id="draftSection">
+
+  <div class="section-title">Draft</div>
+  <div class="teams-grid">
+    <div class="team-panel ally">
+      <div class="team-label">⚔️ Équipe Alliée</div>
+      <ul class="champion-list" id="allyList"></ul>
+    </div>
+    <div class="team-panel enemy">
+      <div class="team-label">💀 Équipe Ennemie <span style="font-size:0.6rem;color:var(--text-dim);font-family:'Rajdhani',sans-serif;font-weight:400;text-transform:none;letter-spacing:0">(clique pour marquer comme fed)</span></div>
+      <ul class="champion-list" id="enemyList"></ul>
     </div>
   </div>
 
-  <!-- Status -->
-  <div class="status-bar" id="statusBar">
-    <div class="spinner"></div>
-    <span id="statusText">Analyse en cours...</span>
+  <!-- Priority enemy alert -->
+  <div class="priority-enemy-alert" id="priorityAlert">
+    ⚠️ <strong id="priorityAlertName"></strong> marqué comme fed — le build et les conseils sont adaptés en conséquence.
+    <button class="btn-link" onclick="clearPriority()" style="margin-left:auto;color:var(--text-dim);font-size:0.75rem">Retirer</button>
   </div>
 
-  <!-- Results -->
-  <div class="draft-section" id="draftSection">
+  <!-- Results area -->
+  <div id="resultsArea"></div>
 
-    <div class="section-title">Draft</div>
-    <div class="teams-grid">
-      <div class="team-panel ally">
-        <div class="team-label">⚔️ Équipe Alliée</div>
-        <ul class="champion-list" id="allyList"></ul>
-      </div>
-      <div class="team-panel enemy">
-        <div class="team-label">💀 Équipe Ennemie</div>
-        <ul class="champion-list" id="enemyList"></ul>
-      </div>
-    </div>
-
-    <div class="section-title">Analyse <span id="providerBadge" style="font-size:0.7rem;background:rgba(11,196,227,0.12);color:var(--blue-spirit);border:1px solid rgba(11,196,227,0.3);padding:2px 8px;border-radius:2px;letter-spacing:0.1em"></span></div>
-    <div class="panel blue-accent">
-      <div class="threat-tags" id="threatTags"></div>
-      <div class="analysis-text" id="analysisText"></div>
-
-      <div class="block-label">Build recommandé</div>
-      <div class="items-row" id="itemsRow"></div>
-
-      <div class="item-reasoning-block">
-        <div class="block-label">Raisonnement itemisation</div>
-        <div class="analysis-text" id="itemReasoningText"></div>
-      </div>
-
-      <div class="priority-block" id="priorityBlock">
-        <span class="priority-label">Priorité absolue</span>
-        <span class="priority-text" id="priorityText"></span>
-      </div>
-    </div>
-
-    <div class="section-title">Conseils de gameplay</div>
-    <div class="panel">
-      <div class="tips-grid" id="tipsGrid"></div>
-    </div>
-
+  <!-- Action row -->
+  <div class="action-row" id="actionRow" style="display:none">
+    <button class="btn-secondary" onclick="generateAlternative()">🔄 Suggestion alternative</button>
+    <button class="btn-secondary" onclick="generateComparison()">⚖️ Comparer avec un autre AI</button>
+    <button class="btn-link" onclick="copyBuildSummary()" style="margin-left:auto">📋 Copier le build</button>
   </div>
 
-  <footer>
-    Shen Support Advisor · Propulsé par Claude (Anthropic) · Non affilié à Riot Games<br>
-    League of Legends © Riot Games, Inc.
-  </footer>
+</div>
+
+<footer>
+  Shen Support Advisor · Multi-AI (Claude / ChatGPT / Gemini) · Non affilié à Riot Games<br>
+  League of Legends © Riot Games, Inc.
+</footer>
 </div>
 
 <script>
 const PROXY_URL = '/api';
+const MAX_HISTORY = 15;
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let currentAllies    = [];
+let currentEnemies   = [];
+let currentMyChamp   = 'Shen';
+let currentPriority  = null;   // champion ennemi marqué fed
+let currentProvider  = 'claude';
+let ddVersion        = '15.6.1';
+let lastMainResult   = null;   // résultat principal pour compare/alternative
+
+// ── PATCH VERSION ─────────────────────────────────────────────────────────────
+async function fetchPatchVersion() {
+  try {
+    const r = await fetch('https://ddragon.leagueoflegends.com/api/versions.json');
+    const versions = await r.json();
+    ddVersion = versions[0];
+    document.getElementById('patchBadge').textContent = 'Patch ' + ddVersion.split('.').slice(0,2).join('.');
+  } catch { document.getElementById('patchBadge').textContent = 'Patch 26.6'; }
+}
 
 // ── TABS ──────────────────────────────────────────────────────────────────────
 function switchTab(tab) {
-  ['search','manual','knowledge'].forEach(t => {
-    document.getElementById('tab-'+t).style.display = t === tab ? 'block' : 'none';
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach((btn,i) => {
+    btn.classList.toggle('active', ['search','manual','knowledge','history'][i] === tab);
   });
-  document.querySelectorAll('.tab').forEach((btn, i) => {
-    btn.classList.toggle('active', ['search','manual','knowledge'][i] === tab);
-  });
+  document.getElementById('tab-'+tab).classList.add('active');
+  if (tab === 'history') renderHistory();
+}
+
+// ── PROVIDER ──────────────────────────────────────────────────────────────────
+const PROVIDER_LABELS = { claude:'Claude', openai:'ChatGPT', gemini:'Gemini', local:'Local' };
+
+function selectProvider(p) {
+  currentProvider = p;
+  document.querySelectorAll('.pbtn').forEach(btn => btn.classList.toggle('active', btn.dataset.p === p));
+  const status = p === 'local' ? '⚙️ Pas de clé requise' : `Clé ${PROVIDER_LABELS[p]} sur Vercel`;
+  document.getElementById('providerStatus').textContent = status;
 }
 
 // ── KNOWLEDGE ─────────────────────────────────────────────────────────────────
 function loadKnowledge() {
-  try {
-    const saved = localStorage.getItem('shen_knowledge');
-    if (saved) document.getElementById('customKnowledge').value = saved;
-  } catch(e) {}
+  try { const s = localStorage.getItem('shen_knowledge'); if(s) document.getElementById('customKnowledge').value = s; } catch(e){}
 }
-
 function saveKnowledge() {
   try {
     localStorage.setItem('shen_knowledge', document.getElementById('customKnowledge').value);
-    const badge = document.getElementById('saveBadge');
-    badge.style.display = 'inline';
-    badge.style.animation = 'none';
-    void badge.offsetHeight;
-    badge.style.animation = 'fadeout 2.2s forwards';
-    setTimeout(() => { badge.style.display = 'none'; }, 2300);
-  } catch(e) {}
+    const b = document.getElementById('saveBadge');
+    b.style.display='inline'; b.style.animation='none'; void b.offsetHeight;
+    b.style.animation='fadeout 2.2s forwards';
+    setTimeout(()=>{b.style.display='none';}, 2300);
+  } catch(e){}
 }
-
 function clearKnowledge() {
-  if (confirm('Effacer toutes tes notes ?')) {
-    document.getElementById('customKnowledge').value = '';
-    try { localStorage.removeItem('shen_knowledge'); } catch(e) {}
+  if(confirm('Effacer toutes tes notes ?')) {
+    document.getElementById('customKnowledge').value='';
+    try { localStorage.removeItem('shen_knowledge'); } catch(e){}
   }
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  loadKnowledge();
-  const ta = document.getElementById('customKnowledge');
-  if (ta) ta.addEventListener('input', () => {
-    clearTimeout(ta._t);
-    ta._t = setTimeout(saveKnowledge, 1200);
-  });
-  document.getElementById('riotId').addEventListener('keydown', e => {
-    if (e.key === 'Enter') fetchLiveGame();
-  });
-});
+// ── PRIORITY ENEMY ────────────────────────────────────────────────────────────
+function setPriority(champName) {
+  currentPriority = currentPriority === champName ? null : champName;
+  renderEnemyList();
+  const alert = document.getElementById('priorityAlert');
+  if (currentPriority) {
+    document.getElementById('priorityAlertName').textContent = currentPriority;
+    alert.style.display = 'flex';
+  } else {
+    alert.style.display = 'none';
+  }
+}
+function clearPriority() { setPriority(null); }
 
-// ── RIOT API ──────────────────────────────────────────────────────────────────
+// ── HISTORY ───────────────────────────────────────────────────────────────────
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem('shen_history') || '[]'); } catch { return []; }
+}
+function saveHistory(entries) {
+  try { localStorage.setItem('shen_history', JSON.stringify(entries)); } catch(e){}
+}
+function addToHistory(entry) {
+  const h = getHistory();
+  h.unshift({ ...entry, id: Date.now(), date: new Date().toLocaleString('fr-FR') });
+  saveHistory(h.slice(0, MAX_HISTORY));
+  updateHistoryBadge();
+}
+function deleteHistoryEntry(id) {
+  saveHistory(getHistory().filter(e => e.id !== id));
+  renderHistory();
+  updateHistoryBadge();
+}
+function clearHistory() {
+  if(confirm('Effacer tout l\'historique ?')) {
+    saveHistory([]);
+    renderHistory();
+    updateHistoryBadge();
+  }
+}
+function updateHistoryBadge() {
+  const n = getHistory().length;
+  const el = document.getElementById('historyCount');
+  if(el) el.textContent = n > 0 ? `(${n})` : '';
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  const h = getHistory();
+  document.getElementById('historyCountLabel').textContent = `${h.length} / ${MAX_HISTORY} parties`;
+  if (!h.length) { list.innerHTML = '<div class="history-empty">Aucune analyse enregistrée.</div>'; return; }
+  list.innerHTML = h.map(entry => `
+    <div class="history-card" onclick="loadHistoryEntry(${entry.id})">
+      <button class="history-delete" onclick="event.stopPropagation();deleteHistoryEntry(${entry.id})">✕</button>
+      <div class="history-card-header">
+        <span class="history-date">${entry.date}</span>
+        <span class="history-provider ${entry.providerUsed}">${PROVIDER_LABELS[entry.providerUsed]||entry.providerUsed}</span>
+        ${entry.priorityEnemy ? `<span class="history-priority-tag">⚠️ ${entry.priorityEnemy} fed</span>` : ''}
+      </div>
+      <div class="history-champs">
+        ${(entry.allies||[]).map(a=>`<img class="history-champ-icon" src="${champIcon(a.name)}" title="${a.name} (${a.role})" onerror="this.style.display='none'">`).join('')}
+        <span style="width:8px"></span>
+        ${(entry.enemies||[]).map(e=>`<img class="history-champ-icon enemy" src="${champIcon(e.name)}" title="${e.name} (${e.role})" onerror="this.style.display='none'">`).join('')}
+      </div>
+      <div class="history-build-preview">${(entry.build||[]).map(i=>i.name).join(' → ')}</div>
+    </div>`).join('');
+}
+
+function loadHistoryEntry(id) {
+  const entry = getHistory().find(e => e.id === id);
+  if (!entry) return;
+  currentAllies   = entry.allies   || [];
+  currentEnemies  = entry.enemies  || [];
+  currentMyChamp  = entry.myChamp  || 'Shen';
+  currentPriority = entry.priorityEnemy || null;
+  switchTab('search');
+  showDraft(currentAllies, currentEnemies, currentMyChamp);
+  document.getElementById('priorityAlert').style.display = 'none';
+  renderResults(entry.mainResult, entry.providerUsed, null, null);
+  document.getElementById('actionRow').style.display = 'flex';
+  lastMainResult = entry.mainResult;
+}
+
+// ── LIVE GAME ─────────────────────────────────────────────────────────────────
 async function fetchLiveGame() {
   const raw = document.getElementById('riotId').value.trim();
   const region = document.getElementById('region').value;
   if (!raw.includes('#')) { showError('Format : Pseudo#EUW1'); return; }
-
   const [gameName, tagLine] = raw.split('#');
   showLoading('Recherche de la partie...');
   document.getElementById('searchBtn').disabled = true;
-
   try {
     const res = await fetch(`${PROXY_URL}/live-game?gameName=${encodeURIComponent(gameName)}&tagLine=${encodeURIComponent(tagLine)}&region=${region}`);
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Erreur API Riot');
     if (!data.participants?.length) throw new Error('Pas de partie en cours trouvée.');
-
-    const { allies, enemies, myChamp } = parseParticipants(data.participants, gameName);
+    const {allies, enemies, myChamp} = parseParticipants(data.participants, gameName);
+    currentAllies = allies; currentEnemies = enemies; currentMyChamp = myChamp;
+    currentPriority = null;
     hideStatus();
     showDraft(allies, enemies, myChamp);
-    await callAnalyze(allies, enemies);
-  } catch (err) {
-    showError(err.message);
-  } finally {
-    document.getElementById('searchBtn').disabled = false;
-  }
+    await runAnalysis(allies, enemies);
+  } catch(err) { showError(err.message); }
+  finally { document.getElementById('searchBtn').disabled = false; }
 }
 
 // ── MANUAL ────────────────────────────────────────────────────────────────────
 async function analyzeManual() {
   const roles = ['Top','Jungle','Mid','ADC','Support'];
-  const allies = [], enemies = [];
-  roles.forEach((role, i) => {
-    const av = i === 4 ? 'Shen' : (document.getElementById(`ally${i}`)?.value.trim() || '');
-    const ev = document.getElementById(`enemy${i}`)?.value.trim() || '';
-    if (av) allies.push({ name: av, role });
-    if (ev) enemies.push({ name: ev, role });
+  const allies=[], enemies=[];
+  roles.forEach((role,i) => {
+    const av = i===4 ? 'Shen' : (document.getElementById(`ally${i}`)?.value.trim()||'');
+    const ev = document.getElementById(`enemy${i}`)?.value.trim()||'';
+    if(av) allies.push({name:av,role});
+    if(ev) enemies.push({name:ev,role});
   });
-  if (!enemies.length) { showError('Entre au moins un champion ennemi.'); return; }
+  if(!enemies.length) { showError('Entre au moins un champion ennemi.'); return; }
+  currentAllies = allies; currentEnemies = enemies; currentMyChamp = 'Shen';
+  currentPriority = null;
   hideStatus();
   showDraft(allies, enemies, 'Shen');
-  await callAnalyze(allies, enemies);
+  await runAnalysis(allies, enemies);
 }
 
-// ── PROVIDER ──────────────────────────────────────────────────────────────────
-let selectedProvider = 'claude';
+// ── ANALYSIS ──────────────────────────────────────────────────────────────────
+async function runAnalysis(allies, enemies, opts={}) {
+  const { alternativeBuild=false, compareProvider=null, isCompare=false } = opts;
+  const label = alternativeBuild ? 'Génération d\'une suggestion alternative...'
+    : compareProvider ? `Comparaison avec ${PROVIDER_LABELS[compareProvider]}...`
+    : `${PROVIDER_LABELS[currentProvider]||'Analyse'} en cours...`;
+  showLoading(label);
 
-const PROVIDER_LABELS = {
-  claude: 'Claude', openai: 'ChatGPT', gemini: 'Gemini', local: 'Local'
-};
-
-const PROVIDER_LOADING = {
-  claude: 'Claude analyse la draft...',
-  openai: 'ChatGPT analyse la draft...',
-  gemini: 'Gemini analyse la draft...',
-  local:  'Analyse locale en cours...'
-};
-
-function selectProvider(p) {
-  selectedProvider = p;
-  document.querySelectorAll('.provider-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.provider === p);
-  });
-  document.getElementById('providerStatus').textContent =
-    p === 'local' ? '⚙️ Pas de clé API requise' : `Clé ${PROVIDER_LABELS[p]} requise sur Vercel`;
-}
-
-// ── ANALYZE ───────────────────────────────────────────────────────────────────
-async function callAnalyze(allies, enemies) {
-  showLoading(PROVIDER_LOADING[selectedProvider] || 'Analyse en cours...');
   const customKnowledge = document.getElementById('customKnowledge')?.value || '';
-
   try {
     const res = await fetch(`${PROXY_URL}/analyze`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ allies, enemies, customKnowledge, provider: selectedProvider })
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        allies, enemies, customKnowledge,
+        provider: compareProvider || currentProvider,
+        priorityEnemy: currentPriority || null,
+        alternativeBuild,
+        compareProvider: isCompare ? null : (compareProvider ? null : null),
+      })
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Erreur analyse');
+    if(!res.ok) throw new Error(data.error||'Erreur analyse');
     hideStatus();
+    lastMainResult = data;
 
-    // Affiche le provider qui a réellement répondu
-    const usedLabel = PROVIDER_LABELS[data.providerUsed] || data.providerUsed || selectedProvider;
-    const badge = document.getElementById('providerBadge');
-    if (badge) badge.textContent = usedLabel + (data.fallbackReason ? ' (fallback)' : '');
-
-    if (data.parsed) renderClaudeResult(data);
-    else document.getElementById('analysisText').textContent = data.raw || '';
-  } catch (err) {
-    showError('Erreur analyse : ' + err.message);
-  }
+    if (isCompare) {
+      // Affiche la comparaison côte à côte
+      renderComparison(lastMainResult, data, data.providerUsed);
+    } else if (alternativeBuild) {
+      renderAlternative(data, data.providerUsed);
+    } else {
+      renderResults(data, data.providerUsed, null, null);
+      // Sauvegarder dans l'historique
+      addToHistory({
+        allies, enemies,
+        myChamp: currentMyChamp,
+        priorityEnemy: currentPriority,
+        providerUsed: data.providerUsed,
+        mainResult: data,
+        build: data.build || []
+      });
+    }
+    document.getElementById('actionRow').style.display = 'flex';
+  } catch(err) { showError('Erreur analyse : ' + err.message); }
 }
 
-// ── PARSE ─────────────────────────────────────────────────────────────────────
-const POSITION_MAP = { TOP:'Top', JUNGLE:'Jungle', MIDDLE:'Mid', BOTTOM:'ADC', UTILITY:'Support' };
-const ROLES_ORDER = ['Top','Jungle','Mid','ADC','Support'];
+async function generateAlternative() {
+  await runAnalysis(currentAllies, currentEnemies, { alternativeBuild: true });
+}
 
-function parseParticipants(participants, myName) {
-  const me = participants.find(p => (p.riotId||p.summonerName||'').toLowerCase().includes(myName.toLowerCase()));
-  const myTeamId = me?.teamId || 100;
-  const allies = [], enemies = [];
-  participants.forEach(p => {
-    const e = { name: p.championName || 'Unknown', role: POSITION_MAP[p.teamPosition] || '?' };
-    (p.teamId === myTeamId ? allies : enemies).push(e);
+async function generateComparison() {
+  // Choisir un provider différent
+  const chain = ['claude','openai','gemini','local'].filter(p => p !== currentProvider);
+  const compareP = chain[0];
+  showLoading(`Comparaison ${PROVIDER_LABELS[currentProvider]} vs ${PROVIDER_LABELS[compareP]}...`);
+  const customKnowledge = document.getElementById('customKnowledge')?.value || '';
+  try {
+    // 2 appels en parallèle
+    const [r1, r2] = await Promise.all([
+      fetch(`${PROXY_URL}/analyze`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ allies:currentAllies, enemies:currentEnemies, customKnowledge, provider:currentProvider, priorityEnemy:currentPriority })
+      }).then(r=>r.json()),
+      fetch(`${PROXY_URL}/analyze`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ allies:currentAllies, enemies:currentEnemies, customKnowledge, provider:compareP, priorityEnemy:currentPriority })
+      }).then(r=>r.json())
+    ]);
+    hideStatus();
+    renderComparison(r1, r2, r1.providerUsed, r2.providerUsed);
+    document.getElementById('actionRow').style.display = 'flex';
+  } catch(err) { showError('Erreur comparaison : ' + err.message); }
+}
+
+function copyBuildSummary() {
+  if (!lastMainResult?.build) return;
+  const txt = lastMainResult.build.map(i=>i.name).join(' → ');
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = event.target;
+    btn.textContent = '✓ Copié !';
+    setTimeout(() => btn.textContent = '📋 Copier le build', 2000);
   });
-  const sort = arr => arr.sort((a,b) => ROLES_ORDER.indexOf(a.role) - ROLES_ORDER.indexOf(b.role));
-  return { allies: sort(allies), enemies: sort(enemies), myChamp: me?.championName || 'Shen' };
 }
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
 function showDraft(allies, enemies, myChamp) {
-  renderChampList('allyList', allies, myChamp);
-  renderChampList('enemyList', enemies, '');
-  ['itemsRow','threatTags','tipsGrid'].forEach(id => document.getElementById(id).innerHTML = '');
-  ['analysisText','itemReasoningText'].forEach(id => document.getElementById(id).innerHTML = '');
-  document.getElementById('priorityBlock').style.display = 'none';
+  renderAllyList(allies, myChamp);
+  renderEnemyList();
+  document.getElementById('resultsArea').innerHTML = '';
+  document.getElementById('priorityAlert').style.display = 'none';
+  document.getElementById('actionRow').style.display = 'none';
   document.getElementById('draftSection').classList.add('visible');
 }
 
-function renderChampList(id, champs, highlight) {
-  const ul = document.getElementById(id);
+function renderAllyList(allies, myChamp) {
+  const ul = document.getElementById('allyList');
   ul.innerHTML = '';
-  champs.forEach(c => {
-    const isMe = c.name.toLowerCase() === (highlight||'').toLowerCase();
-    const icon = `https://ddragon.leagueoflegends.com/cdn/15.6.1/img/champion/${formatChampKey(c.name)}.png`;
+  allies.forEach(c => {
+    const isMe = c.name.toLowerCase() === (myChamp||'').toLowerCase();
     ul.innerHTML += `
       <li class="champion-item ${isMe?'is-me':''}">
-        <img class="champ-icon ${isMe?'is-me':''}" src="${icon}"
-          onerror="this.src='https://ddragon.leagueoflegends.com/cdn/15.6.1/img/champion/Shen.png'" alt="${c.name}">
+        <img class="champ-icon ${isMe?'is-me':''}" src="${champIcon(c.name)}" onerror="this.src='${champIcon('Shen')}'" alt="${c.name}">
         <div><div class="champ-name">${c.name}</div><div class="champ-role">${c.role}</div></div>
-        ${isMe ? '<span class="you-badge">YOU</span>' : ''}
+        ${isMe?'<span class="you-badge">YOU</span>':''}
       </li>`;
   });
 }
 
-function renderClaudeResult(data) {
-  const tagsEl = document.getElementById('threatTags');
-  (data.threats||[]).forEach((label, i) => {
-    const cls = (data.threatTypes||[])[i] || 'mixed';
-    tagsEl.innerHTML += `<span class="threat-tag ${cls}">${label}</span>`;
+function renderEnemyList() {
+  const ul = document.getElementById('enemyList');
+  ul.innerHTML = '';
+  currentEnemies.forEach(c => {
+    const isPriority = c.name === currentPriority;
+    ul.innerHTML += `
+      <li class="champion-item ${isPriority?'is-priority':''}" onclick="setPriority('${c.name}')">
+        <img class="champ-icon ${isPriority?'is-priority':''}" src="${champIcon(c.name)}" onerror="this.src='${champIcon('Shen')}'" alt="${c.name}">
+        <div><div class="champ-name">${c.name}</div><div class="champ-role">${c.role}</div></div>
+        ${isPriority?'<span class="priority-badge">⚠️ FED</span>':''}
+      </li>`;
   });
-
-  document.getElementById('analysisText').innerHTML = data.analysis || '';
-
-  const row = document.getElementById('itemsRow');
-  (data.build||[]).forEach((item, i) => {
-    if (i === 2) row.innerHTML += `<div class="separator"></div>`;
-    const iconUrl = getItemIcon(item.name);
-    row.innerHTML += `
-      <div class="item-card">
-        <div class="item-icon-wrap">
-          <span class="item-order">${item.order}</span>
-          <img class="item-icon ${item.tag}" src="${iconUrl}"
-            onerror="this.style.background='#1a2a3a'" alt="${item.name}" title="${item.reason||''}">
-        </div>
-        <div class="item-name">${item.name}</div>
-        <span class="item-tag-badge tag-${item.tag}">${item.tag==='core'?'Core':item.tag==='boots'?'Bottes':'Situa.'}</span>
-      </div>`;
-  });
-
-  document.getElementById('itemReasoningText').innerHTML = data.itemReasoning || '';
-
-  if (data.ultraPriority) {
-    document.getElementById('priorityText').textContent = data.ultraPriority;
-    document.getElementById('priorityBlock').style.display = 'flex';
+  if (currentEnemies.length) {
+    const li = document.createElement('li');
+    li.className='priority-hint';
+    li.textContent = currentPriority ? `${currentPriority} marqué comme priorité — relance l'analyse pour adapter.` : 'Clique un ennemi pour le marquer fed.';
+    ul.appendChild(li);
   }
-
-  const grid = document.getElementById('tipsGrid');
-  (data.gameplayTips||[]).forEach(tip => {
-    grid.innerHTML += `<div class="tip-card">${tip}</div>`;
-  });
 }
 
-// ── ITEM ICONS ────────────────────────────────────────────────────────────────
+function renderResults(data, providerUsed, altData, altProvider) {
+  const area = document.getElementById('resultsArea');
+  area.innerHTML = `
+    <div class="section-title">
+      Analyse
+      <span style="font-size:0.68rem;background:rgba(11,196,227,0.1);color:var(--blue-spirit);border:1px solid rgba(11,196,227,0.28);padding:2px 8px;border-radius:2px;letter-spacing:0.1em">${PROVIDER_LABELS[providerUsed]||providerUsed}</span>
+    </div>
+    <div class="panel blue-accent">
+      ${buildResultHTML(data)}
+    </div>
+    ${altData ? `
+    <div class="section-title">
+      Suggestion alternative
+      <span style="font-size:0.68rem;background:rgba(200,155,60,0.1);color:var(--gold);border:1px solid rgba(200,155,60,0.28);padding:2px 8px;border-radius:2px;letter-spacing:0.1em">${PROVIDER_LABELS[altProvider]||altProvider}</span>
+    </div>
+    <div class="panel" style="border-color:rgba(200,155,60,0.3)">
+      ${buildResultHTML(altData)}
+    </div>` : ''}
+    <div class="section-title">Conseils de gameplay</div>
+    <div class="panel">
+      <div class="tips-grid">${(data.gameplayTips||[]).map(t=>`<div class="tip-card">${t}</div>`).join('')}</div>
+    </div>`;
+}
+
+function renderAlternative(altData, altProvider) {
+  // Appende la suggestion alternative sous les résultats existants
+  const area = document.getElementById('resultsArea');
+  const existing = area.querySelector('.alt-section');
+  if(existing) existing.remove();
+  const div = document.createElement('div');
+  div.className = 'alt-section';
+  div.innerHTML = `
+    <div class="section-title">
+      Suggestion alternative
+      <span style="font-size:0.68rem;background:rgba(200,155,60,0.1);color:var(--gold);border:1px solid rgba(200,155,60,0.28);padding:2px 8px;border-radius:2px;letter-spacing:0.1em">${PROVIDER_LABELS[altProvider]||altProvider}</span>
+    </div>
+    <div class="panel" style="border-color:rgba(200,155,60,0.3)">
+      ${buildResultHTML(altData)}
+    </div>`;
+  area.appendChild(div);
+}
+
+function renderComparison(d1, d2, p1, p2) {
+  const area = document.getElementById('resultsArea');
+  area.innerHTML = `
+    <div class="section-title">Comparaison de builds</div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-header">
+          <span class="compare-provider-tag ${p1||''}">${PROVIDER_LABELS[p1]||p1||'—'}</span>
+        </div>
+        <div class="panel blue-accent">${buildResultHTML(d1)}</div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-header">
+          <span class="compare-provider-tag ${p2||''}">${PROVIDER_LABELS[p2]||p2||'—'}</span>
+        </div>
+        <div class="panel" style="border-color:rgba(200,155,60,0.3)">${buildResultHTML(d2)}</div>
+      </div>
+    </div>
+    <div class="section-title">Conseils (${PROVIDER_LABELS[p1]||p1})</div>
+    <div class="panel">
+      <div class="tips-grid">${(d1.gameplayTips||[]).map(t=>`<div class="tip-card">${t}</div>`).join('')}</div>
+    </div>`;
+}
+
+function buildResultHTML(data) {
+  if (!data) return '<div style="color:var(--text-dim);font-size:0.86rem">Aucune donnée.</div>';
+  const threats = (data.threats||[]).map((l,i)=>`<span class="threat-tag ${(data.threatTypes||[])[i]||'mixed'}">${l}</span>`).join('');
+  const items = (data.build||[]).map((item,i) => {
+    const sep = i===2 ? '<div class="separator"></div>' : '';
+    return sep + `<div class="item-card">
+      <div class="item-icon-wrap">
+        <span class="item-order">${item.order}</span>
+        <img class="item-icon ${item.tag}" src="${itemIcon(item.name)}" onerror="this.style.background='#1a2a3a'" alt="${item.name}" title="${item.reason||''}">
+      </div>
+      <div class="item-name">${item.name}</div>
+      <span class="item-tag-badge tag-${item.tag}">${item.tag==='core'?'Core':item.tag==='boots'?'Bottes':'Situa.'}</span>
+    </div>`;
+  }).join('');
+  const priority = data.ultraPriority ? `
+    <div class="priority-block" style="display:flex">
+      <span class="priority-label">Priorité absolue</span>
+      <span class="priority-text">${data.ultraPriority}</span>
+    </div>` : '';
+  return `
+    <div class="threat-tags">${threats}</div>
+    <div class="analysis-text">${data.analysis||''}</div>
+    <div class="block-label">Build recommandé</div>
+    <div class="items-row">${items}</div>
+    <div class="item-reasoning-block">
+      <div class="block-label">Raisonnement</div>
+      <div class="analysis-text">${data.itemReasoning||''}</div>
+    </div>
+    ${priority}`;
+}
+
+// ── PARSE PARTICIPANTS ────────────────────────────────────────────────────────
+const POSITION_MAP = {TOP:'Top',JUNGLE:'Jungle',MIDDLE:'Mid',BOTTOM:'ADC',UTILITY:'Support'};
+const ROLES_ORDER  = ['Top','Jungle','Mid','ADC','Support'];
+
+function parseParticipants(participants, myName) {
+  const me = participants.find(p=>(p.riotId||p.summonerName||'').toLowerCase().includes(myName.toLowerCase()));
+  const myTeamId = me?.teamId||100;
+  const allies=[], enemies=[];
+  participants.forEach(p => {
+    const e = {name:p.championName||'Unknown', role:POSITION_MAP[p.teamPosition]||'?'};
+    (p.teamId===myTeamId?allies:enemies).push(e);
+  });
+  const sort = arr => arr.sort((a,b)=>ROLES_ORDER.indexOf(a.role)-ROLES_ORDER.indexOf(b.role));
+  return {allies:sort(allies), enemies:sort(enemies), myChamp:me?.championName||'Shen'};
+}
+
+// ── ICONS ─────────────────────────────────────────────────────────────────────
 const ITEM_IDS = {
-  "flûte de bandle":227055, "harnais protoplasmique":3068,
-  "tabi ninja":3047, "bottes de mercure":3111, "bottes de rapidité":3009,
-  "locket":3190, "vœu du chevalier":3109, "knight's vow":3109,
-  "bouclier solaire":3105, "aegis":3105, "warmog":3083,
-  "stoneplate":3193, "gargoyle":3193, "rédemption":3107,
-  "masque abyssal":3001, "force de la nature":3076,
-  "cœur gelé":3110, "frozen heart":3110,
-  "mail épineux":3075, "thornmail":3075,
+  "flûte de bandle":227055,"harnais protoplasmique":3068,
+  "tabi ninja":3047,"bottes de mercure":3111,"bottes de rapidité":3009,
+  "locket":3190,"vœu du chevalier":3109,"knight's vow":3109,
+  "bouclier solaire":3105,"aegis":3105,"warmog":3083,
+  "stoneplate":3193,"gargoyle":3193,"rédemption":3107,
+  "masque abyssal":3001,"force de la nature":3076,
+  "cœur gelé":3110,"frozen heart":3110,
+  "mail épineux":3075,"thornmail":3075,
 };
 
-function getItemIcon(name) {
-  const key = name.toLowerCase().trim();
-  for (const [k, id] of Object.entries(ITEM_IDS)) {
-    if (key.includes(k) || k.includes(key.slice(0,6))) {
-      return `https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/${id}.png`;
-    }
+function itemIcon(name) {
+  const key = (name||'').toLowerCase().trim();
+  for(const [k,id] of Object.entries(ITEM_IDS)) {
+    if(key.includes(k)||k.includes(key.slice(0,6)))
+      return `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/item/${id}.png`;
   }
-  return `https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/3068.png`;
+  return `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/item/3068.png`;
+}
+
+function champIcon(name) {
+  return `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/champion/${formatChampKey(name)}.png`;
 }
 
 function formatChampKey(name) {
-  const ex = {
-    "Wukong":"MonkeyKing","Kai'Sa":"Kaisa","Kha'Zix":"Khazix","Vel'Koz":"Velkoz",
-    "Rek'Sai":"RekSai","Cho'Gath":"Chogath","Kog'Maw":"KogMaw","LeBlanc":"Leblanc",
-    "Lee Sin":"LeeSin","Master Yi":"MasterYi","Miss Fortune":"MissFortune",
-    "Jarvan IV":"JarvanIV","Twisted Fate":"TwistedFate","Xin Zhao":"XinZhao",
-    "Aurelion Sol":"AurelionSol","Bel'Veth":"Belveth","K'Sante":"KSante",
-    "Dr. Mundo":"DrMundo","Renata Glasc":"Renata"
-  };
-  return ex[name] || name.replace(/[^a-zA-Z0-9]/g,'');
+  const ex = {"Wukong":"MonkeyKing","Kai'Sa":"Kaisa","Kha'Zix":"Khazix","Vel'Koz":"Velkoz","Rek'Sai":"RekSai","Cho'Gath":"Chogath","Kog'Maw":"KogMaw","LeBlanc":"Leblanc","Lee Sin":"LeeSin","Master Yi":"MasterYi","Miss Fortune":"MissFortune","Jarvan IV":"JarvanIV","Twisted Fate":"TwistedFate","Xin Zhao":"XinZhao","Aurelion Sol":"AurelionSol","Bel'Veth":"Belveth","K'Sante":"KSante","Dr. Mundo":"DrMundo","Renata Glasc":"Renata"};
+  return ex[name] || (name||'').replace(/[^a-zA-Z0-9]/g,'');
 }
 
 // ── STATUS ────────────────────────────────────────────────────────────────────
 function showLoading(msg) {
-  const b = document.getElementById('statusBar');
-  b.className = 'status-bar loading';
-  document.getElementById('statusText').textContent = msg;
+  const b=document.getElementById('statusBar'); b.className='status-bar loading';
+  document.getElementById('statusText').textContent=msg;
 }
-
 function showError(msg) {
-  const b = document.getElementById('statusBar');
-  b.className = 'status-bar error';
-  b.innerHTML = '⚠️ ' + msg;
+  const b=document.getElementById('statusBar'); b.className='status-bar error'; b.innerHTML='⚠️ '+msg;
 }
+function hideStatus() { document.getElementById('statusBar').className='status-bar'; }
 
-function hideStatus() { document.getElementById('statusBar').className = 'status-bar'; }
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  fetchPatchVersion();
+  loadKnowledge();
+  updateHistoryBadge();
+  const ta = document.getElementById('customKnowledge');
+  if(ta) ta.addEventListener('input', ()=>{ clearTimeout(ta._t); ta._t=setTimeout(saveKnowledge,1200); });
+  document.getElementById('riotId').addEventListener('keydown', e=>{ if(e.key==='Enter') fetchLiveGame(); });
+});
 </script>
 </body>
 </html>
