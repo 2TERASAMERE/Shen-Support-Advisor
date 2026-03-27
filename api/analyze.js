@@ -1,11 +1,12 @@
-// api/analyze.js
-// Vercel Serverless Function — Multi-provider AI (Claude / ChatGPT / Gemini / Local)
+// api/analyze.js — Multi-provider, auto-fallback, priority enemy, dual build
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 const OPENAI_API_KEY    = process.env.OPENAI_API_KEY;
 const GEMINI_API_KEY    = process.env.GEMINI_API_KEY;
 
-// ── KNOWLEDGE BASE ────────────────────────────────────────────────────────────
+// Fallback chain order: Claude → ChatGPT → Gemini → Local
+const PROVIDER_CHAIN = ['claude', 'openai', 'gemini', 'local'];
+
 const SHEN_KNOWLEDGE_BASE = `
 CORE BUILD (règles absolues) :
 - Flûte de Bandle est TOUJOURS le premier item, sans exception.
@@ -49,57 +50,97 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { allies, enemies, customKnowledge, provider } = req.body;
+  const {
+    allies, enemies, customKnowledge,
+    provider,           // provider demandé par l'utilisateur
+    priorityEnemy,      // champion ennemi marqué comme fed/prioritaire (optionnel)
+    alternativeBuild,   // true = demande une 2ème suggestion alternative
+    compareProvider,    // provider pour la 2ème colonne de comparaison (optionnel)
+  } = req.body;
+
   if (!allies || !enemies) return res.status(400).json({ error: 'Paramètres manquants.' });
 
-  const knowledge = buildKnowledgeBlock(customKnowledge);
+  const knowledge   = buildKnowledgeBlock(customKnowledge);
   const systemPrompt = buildSystemPrompt(knowledge);
-  const userPrompt = buildUserPrompt(allies, enemies);
-
-  // Route vers le bon provider
-  const selectedProvider = provider || 'local';
+  const userPrompt   = buildUserPrompt(allies, enemies, priorityEnemy, alternativeBuild);
 
   try {
-    let result;
+    // ── Build principal ──────────────────────────────────────────────────────
+    const { result: mainResult, providerUsed: mainProvider } =
+      await callWithFallback(provider, systemPrompt, userPrompt, allies, enemies, knowledge);
 
-    if (selectedProvider === 'claude' && ANTHROPIC_API_KEY) {
-      result = await callClaude(systemPrompt, userPrompt);
-    } else if (selectedProvider === 'openai' && OPENAI_API_KEY) {
-      result = await callOpenAI(systemPrompt, userPrompt);
-    } else if (selectedProvider === 'gemini' && GEMINI_API_KEY) {
-      result = await callGemini(systemPrompt, userPrompt);
-    } else {
-      // Fallback local si provider indisponible ou "local" sélectionné
-      result = { json: buildLocalAnalysis(allies, enemies, knowledge), usedLocal: true };
+    const mainParsed = parseResult(mainResult);
+
+    // ── Build de comparaison (si demandé) ────────────────────────────────────
+    let compareResult = null;
+    let compareProviderUsed = null;
+
+    if (compareProvider) {
+      // On exclude le provider principal pour vraiment comparer
+      const chain = PROVIDER_CHAIN.filter(p => p !== mainProvider);
+      const target = chain.includes(compareProvider) ? compareProvider : chain[0];
+      const { result: cResult, providerUsed: cProvider } =
+        await callWithFallback(target, systemPrompt, userPrompt, allies, enemies, knowledge, [mainProvider]);
+      compareResult     = parseResult(cResult);
+      compareProviderUsed = cProvider;
     }
 
-    // Indique quel provider a réellement répondu
-    const providerUsed = result.usedLocal ? 'local'
-      : selectedProvider === 'claude' ? 'claude'
-      : selectedProvider === 'openai' ? 'openai'
-      : 'gemini';
-
-    const clean = (result.json || '').replace(/```json|```/g, '').trim();
-    let parsed;
-    try { parsed = JSON.parse(clean); }
-    catch { return res.status(200).json({ raw: result.json, parsed: false, providerUsed }); }
-
-    return res.status(200).json({ ...parsed, parsed: true, providerUsed });
+    return res.status(200).json({
+      ...mainParsed,
+      parsed: true,
+      providerUsed: mainProvider,
+      // Données de comparaison
+      compareResult: compareResult || null,
+      compareProviderUsed: compareProviderUsed || null,
+    });
 
   } catch (err) {
     console.error('Analyze error:', err);
-    // Fallback sur local en cas d'erreur AI
-    try {
-      const localJson = buildLocalAnalysis(allies, enemies, knowledge);
-      const parsed = JSON.parse(localJson);
-      return res.status(200).json({ ...parsed, parsed: true, providerUsed: 'local', fallbackReason: err.message });
-    } catch {
-      return res.status(500).json({ error: 'Erreur interne : ' + err.message });
-    }
+    return res.status(500).json({ error: 'Erreur interne : ' + err.message });
   }
 };
 
-// ── PROVIDERS ─────────────────────────────────────────────────────────────────
+// ── FALLBACK CHAIN ────────────────────────────────────────────────────────────
+async function callWithFallback(requestedProvider, systemPrompt, userPrompt, allies, enemies, knowledge, exclude = []) {
+  // Construire la chaîne: provider demandé en premier, puis les autres dans l'ordre
+  const chain = [requestedProvider, ...PROVIDER_CHAIN.filter(p => p !== requestedProvider)]
+    .filter(p => !exclude.includes(p));
+
+  for (const provider of chain) {
+    try {
+      if (provider === 'local') {
+        return { result: { json: buildLocalAnalysis(allies, enemies) }, providerUsed: 'local' };
+      }
+      if (provider === 'claude' && ANTHROPIC_API_KEY) {
+        const result = await callClaude(systemPrompt, userPrompt);
+        return { result, providerUsed: 'claude' };
+      }
+      if (provider === 'openai' && OPENAI_API_KEY) {
+        const result = await callOpenAI(systemPrompt, userPrompt);
+        return { result, providerUsed: 'openai' };
+      }
+      if (provider === 'gemini' && GEMINI_API_KEY) {
+        const result = await callGemini(systemPrompt, userPrompt);
+        return { result, providerUsed: 'gemini' };
+      }
+      // Clé manquante pour ce provider → essayer le suivant
+    } catch (err) {
+      console.warn(`Provider ${provider} failed: ${err.message}, trying next...`);
+      // Erreur API (crédits épuisés etc.) → essayer le suivant
+    }
+  }
+
+  // Dernier recours : local
+  return { result: { json: buildLocalAnalysis(allies, enemies) }, providerUsed: 'local' };
+}
+
+function parseResult(result) {
+  const clean = (result.json || '').replace(/```json|```/g, '').trim();
+  try { return JSON.parse(clean); }
+  catch { return { raw: result.json, parsed: false }; }
+}
+
+// ── AI PROVIDERS ──────────────────────────────────────────────────────────────
 async function callClaude(systemPrompt, userPrompt) {
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -115,10 +156,7 @@ async function callClaude(systemPrompt, userPrompt) {
       messages: [{ role: 'user', content: userPrompt }]
     })
   });
-  if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.error?.message || 'Erreur Claude');
-  }
+  if (!response.ok) { const e = await response.json(); throw new Error(e.error?.message || 'Claude error'); }
   const data = await response.json();
   return { json: data.content?.[0]?.text || '' };
 }
@@ -126,23 +164,14 @@ async function callClaude(systemPrompt, userPrompt) {
 async function callOpenAI(systemPrompt, userPrompt) {
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${OPENAI_API_KEY}`
-    },
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENAI_API_KEY}` },
     body: JSON.stringify({
       model: 'gpt-4o-mini',
       response_format: { type: 'json_object' },
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
-      ]
+      messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }]
     })
   });
-  if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.error?.message || 'Erreur OpenAI');
-  }
+  if (!response.ok) { const e = await response.json(); throw new Error(e.error?.message || 'OpenAI error'); }
   const data = await response.json();
   return { json: data.choices?.[0]?.message?.content || '' };
 }
@@ -158,81 +187,71 @@ async function callGemini(systemPrompt, userPrompt) {
       generationConfig: { responseMimeType: 'application/json' }
     })
   });
-  if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.error?.message || 'Erreur Gemini');
-  }
+  if (!response.ok) { const e = await response.json(); throw new Error(e.error?.message || 'Gemini error'); }
   const data = await response.json();
   return { json: data.candidates?.[0]?.content?.parts?.[0]?.text || '' };
 }
 
 // ── LOCAL ENGINE ──────────────────────────────────────────────────────────────
-function buildLocalAnalysis(allies, enemies, knowledge) {
+function buildLocalAnalysis(allies, enemies) {
   const enemyNames = enemies.map(e => e.name.toLowerCase());
   const allyNames  = allies.map(a => a.name.toLowerCase());
 
-  const AD_CHAMPS  = ['jinx','caitlyn','jhin','draven','vayne','ashe','tristana','sivir','lucian','samira','aphelios','xayah','twitch','kogmaw',"kog'maw",'kalista','miss fortune','darius','garen','fiora','camille','renekton','riven','tryndamere','aatrox','sett','olaf','jarvan iv','vi','graves','nocturne','master yi',"kha'zix",'khazix','rengar','viego','hecarim','talon','zed','pantheon','wukong'];
-  const AP_CHAMPS  = ['lux','syndra','orianna','zoe','viktor','azir','xerath','veigar','annie','brand','zyra','karma','morgana',"vel'koz",'velkoz','leblanc','fizz','ahri','sylas','diana','ekko','taliyah','anivia','malzahar','seraphine','nidalee','elise','zac','amumu','malphite','mordekaiser','teemo','soraka','sona','nami','janna','lulu'];
-  const POKE_CHAMPS   = ['xerath',"vel'koz",'velkoz','lux','caitlyn','ezreal','jayce','zoe','karma','ziggs','varus'];
-  const DIVE_CHAMPS   = ['fizz','zed','talon','rengar',"kha'zix",'khazix','kayn','nocturne','vi','jarvan iv','hecarim','irelia'];
-  const HEAL_CHAMPS   = ['aatrox','soraka','yuumi','sona','nami','vladimir','sylas'];
-  const MOBILE_ADC    = ['jinx',"kog'maw",'kogmaw','aphelios','ashe'];
+  const AD_CHAMPS   = ['jinx','caitlyn','jhin','draven','vayne','ashe','tristana','sivir','lucian','samira','aphelios','xayah','twitch',"kog'maw",'kogmaw','kalista','miss fortune','darius','garen','fiora','camille','renekton','riven','tryndamere','aatrox','sett','olaf','jarvan iv','vi','graves','nocturne','master yi',"kha'zix",'khazix','rengar','viego','hecarim','talon','zed','pantheon','wukong'];
+  const AP_CHAMPS   = ['lux','syndra','orianna','zoe','viktor','azir','xerath','veigar','annie','brand','zyra','karma','morgana',"vel'koz",'velkoz','leblanc','fizz','ahri','sylas','diana','ekko','taliyah','anivia','malzahar','seraphine','nidalee','elise','zac','amumu','malphite','mordekaiser','teemo','soraka','sona','nami','janna','lulu'];
+  const POKE_CHAMPS = ['xerath',"vel'koz",'velkoz','lux','caitlyn','ezreal','jayce','zoe','karma','ziggs','varus'];
+  const DIVE_CHAMPS = ['fizz','zed','talon','rengar',"kha'zix",'khazix','kayn','nocturne','vi','jarvan iv','hecarim','irelia'];
+  const HEAL_CHAMPS = ['aatrox','soraka','yuumi','sona','nami','vladimir','sylas'];
+  const IMMOBILE_ADC = ['jinx',"kog'maw",'kogmaw','aphelios','ashe'];
 
   let adCount = 0, apCount = 0;
-  enemyNames.forEach(n => {
-    if (AD_CHAMPS.includes(n)) adCount++;
-    if (AP_CHAMPS.includes(n)) apCount++;
-  });
+  enemyNames.forEach(n => { if (AD_CHAMPS.includes(n)) adCount++; if (AP_CHAMPS.includes(n)) apCount++; });
 
-  const hasPoke   = enemyNames.some(n => POKE_CHAMPS.includes(n));
-  const hasDive   = enemyNames.some(n => DIVE_CHAMPS.includes(n));
-  const hasHeal   = enemyNames.some(n => HEAL_CHAMPS.includes(n));
-  const hasAlliesAP = allyNames.some(n => AP_CHAMPS.includes(n));
-  const hasImmobileADC = allyNames.some(n => MOBILE_ADC.includes(n));
-
+  const hasPoke  = enemyNames.some(n => POKE_CHAMPS.includes(n));
+  const hasDive  = enemyNames.some(n => DIVE_CHAMPS.includes(n));
+  const hasHeal  = enemyNames.some(n => HEAL_CHAMPS.includes(n));
+  const hasAllyAP = allyNames.some(n => AP_CHAMPS.includes(n));
+  const hasImmobileADC = allyNames.some(n => IMMOBILE_ADC.includes(n));
   const isFullAD = apCount === 0 && adCount >= 2;
   const isFullAP = adCount === 0 && apCount >= 2;
 
   const build = [
-    { order:1, name:"Flûte de Bandle", tag:"core", reason:"Core absolu — résistances duales et bouclier actif." },
-    { order:2, name:"Harnais Protoplasmique", tag:"core", reason:"Core fixe — HP massifs et passive Immolate." },
-    { order:3, name: isFullAD ? "Tabi Ninja" : isFullAP ? "Bottes de Mercure" : "Bottes de Rapidité", tag:"boots", reason: isFullAD ? "Full AD ennemi détecté." : isFullAP ? "Full AP ennemi détecté." : "Mobilité pour les rotations." },
+    { order:1, name:"Flûte de Bandle",       tag:"core",       reason:"Core absolu." },
+    { order:2, name:"Harnais Protoplasmique", tag:"core",       reason:"Core fixe." },
+    { order:3, name: isFullAD ? "Tabi Ninja" : isFullAP ? "Bottes de Mercure" : "Bottes de Rapidité", tag:"boots", reason: isFullAD ? "Full AD." : isFullAP ? "Full AP." : "Mobilité." },
   ];
 
-  if (hasPoke)               build.push({ order:4, name:"Rédemption",              tag:"situational", reason:"Compo poke — soin à distance entre les fights." });
-  else if (isFullAP)         build.push({ order:4, name:"Force de la Nature",       tag:"situational", reason:"Full AP — résistance magique maximale." });
-  else if (isFullAD&&hasHeal)build.push({ order:4, name:"Mail Épineux",             tag:"situational", reason:"Full AD + healing — réduction des soins ennemis." });
-  else if (isFullAD)         build.push({ order:4, name:"Cœur Gelé",                tag:"situational", reason:"Full AD — armor + ralentissement AA." });
-  else if (hasDive||hasImmobileADC) build.push({ order:4, name:"Vœu du Chevalier", tag:"situational", reason:"Protège ton carry prioritaire contre le dive." });
-  else                       build.push({ order:4, name:"Locket de l'Épouvantail",  tag:"situational", reason:"Bouclier AoE polyvalent pour les teamfights." });
+  if (hasPoke)                    build.push({ order:4, name:"Rédemption",             tag:"situational", reason:"Poke comp." });
+  else if (isFullAP)              build.push({ order:4, name:"Force de la Nature",      tag:"situational", reason:"Full AP." });
+  else if (isFullAD && hasHeal)   build.push({ order:4, name:"Mail Épineux",            tag:"situational", reason:"AD + healing." });
+  else if (isFullAD)              build.push({ order:4, name:"Cœur Gelé",               tag:"situational", reason:"Full AD." });
+  else if (hasDive||hasImmobileADC) build.push({ order:4, name:"Vœu du Chevalier",     tag:"situational", reason:"Protège le carry." });
+  else                            build.push({ order:4, name:"Locket de l'Épouvantail", tag:"situational", reason:"AoE polyvalent." });
 
-  if (hasAlliesAP)           build.push({ order:5, name:"Masque Abyssal",           tag:"situational", reason:"Alliés AP — amplifie leurs dégâts via l'aura." });
-  else if (isFullAP)         build.push({ order:5, name:"Bouclier Solaire",          tag:"situational", reason:"MR additionnelle + aura pour l'équipe." });
-  else                       build.push({ order:5, name:"Stoneplate de Gargouille", tag:"situational", reason:"Compo mixte — actif défensif pour engager." });
+  if (hasAllyAP)    build.push({ order:5, name:"Masque Abyssal",           tag:"situational", reason:"Amplifie les alliés AP." });
+  else if (isFullAP) build.push({ order:5, name:"Bouclier Solaire",         tag:"situational", reason:"MR + aura." });
+  else               build.push({ order:5, name:"Stoneplate de Gargouille", tag:"situational", reason:"Engage défensif." });
 
-  build.push({ order:6, name:"Armure de Warmog", tag:"situational", reason:"Sustain entre les fights, maximise la présence via l'ulti." });
+  build.push({ order:6, name:"Armure de Warmog", tag:"situational", reason:"Sustain entre fights." });
 
-  const threats = [];
-  const threatTypes = [];
+  const threats = [], threatTypes = [];
   if (adCount >= 2) { threats.push(`AD (${adCount})`); threatTypes.push('ad'); }
   if (apCount >= 2) { threats.push(`AP (${apCount})`); threatTypes.push('ap'); }
-  if (hasPoke)      { threats.push('Poke comp'); threatTypes.push('poke'); }
-  if (hasDive)      { threats.push('Dive threat'); threatTypes.push('engage'); }
-  if (hasHeal)      { threats.push('Healing ennemi'); threatTypes.push('heal'); }
+  if (hasPoke)      { threats.push('Poke comp');        threatTypes.push('poke'); }
+  if (hasDive)      { threats.push('Dive threat');      threatTypes.push('engage'); }
+  if (hasHeal)      { threats.push('Healing ennemi');   threatTypes.push('heal'); }
 
   return JSON.stringify({
-    build,
-    threats,
-    threatTypes,
-    analysis: `Composition ${isFullAD ? 'dominée par l\'AD' : isFullAP ? 'dominée par l\'AP' : 'mixte'} détectée. ${hasPoke ? 'Compo poke présente — jouer prudemment en laning phase. ' : ''}${hasDive ? 'Menace de dive sur ton carry. ' : ''}Build orienté en conséquence.`,
-    itemReasoning: `Flûte et Harnais constituent le socle inébranlable. ${hasPoke ? 'Rédemption prioritaire pour contrer le chip damage. ' : ''}${isFullAD ? 'Tabi Ninja et Cœur Gelé pour maximiser l\'armure. ' : isFullAP ? 'Bottes Mercure et Force de la Nature contre le magic damage. ' : ''}${hasAlliesAP ? 'Masque Abyssal pour amplifier les alliés AP. ' : ''}Warmog en 6ème pour le sustain entre les rotations via ulti.`,
+    build, threats, threatTypes,
+    analysis: `Composition ${isFullAD?'full AD':isFullAP?'full AP':'mixte'} détectée. ${hasPoke?'Poke présent. ':''}${hasDive?'Dive détecté. ':''}Build local généré.`,
+    itemReasoning: `Core Flûte+Harnais. ${isFullAD?'Tabi+Cœur Gelé pour l\'armure. ':isFullAP?'Merc+Force de la Nature contre l\'AP. ':''}${hasAllyAP?'Masque Abyssal pour tes alliés AP. ':''}Warmog pour le sustain.`,
     gameplayTips: [
-      hasDive ? `Dive détectée (${enemies.filter(e=>DIVE_CHAMPS.includes(e.name.toLowerCase())).map(e=>e.name).join(', ')}) — surveille ton carry et garde ton ulti en priorité pour lui.` : "Joue les rotations via ulti dès que ton carry est en danger ailleurs sur la carte.",
-      hasPoke ? "Compo poke : reste derrière les minions, engage seulement quand tu as ton bouclier Ki Barrier actif." : "Engage avec Shadow Dash (E) à travers les murs pour des angles inattendus.",
-      hasHeal ? "Healing ennemi : active Mail Épineux avant que l'ennemi commence à se heal, pas après." : "En teamfight, taunt le maximum d'ennemis avec E pour protéger tes carries.",
-      hasImmobileADC ? `${allies.filter(a=>MOBILE_ADC.includes(a.name.toLowerCase())).map(a=>a.name).join(', ')} est immobile — Vœu du Chevalier et ulti en priorité sur lui/elle.` : "Timing d'ulti optimal : allié à 50-60% de vie en fight, pas en urgence à 10%."
+      hasDive ? "Dive détecté — garde ton ulti pour sauver ton carry." : "Optimise tes rotations via ulti sur toute la carte.",
+      hasPoke ? "Compo poke — engage derrière ton Ki Barrier." : "Taunt (E) le max d'ennemis en teamfight.",
+      hasHeal ? "Active Mail Épineux AVANT que l'ennemi se heal." : "Timing ulti : 50-60% de vie de l'allié, pas à 10%.",
+      hasImmobileADC ? "Ton ADC est immobile — couvre-le en priorité avec Vœu+ulti." : "Shadow Dash à travers les murs pour des angles surprises."
     ],
-    ultraPriority: hasDive ? `Surveille les assassins ennemis — garde ton ulti pour sauver ton carry du dive.` : hasPoke ? "Rush Rédemption pour contrer le poke et prends des fights courts et décisifs." : "Maximise les rotations via ulti pour créer des avantages numériques sur toute la carte."
+    ultraPriority: hasDive ? "Surveille les assassins — garde l'ulti pour le carry." : hasPoke ? "Rush Rédemption, fights courts." : "Rotations via ulti pour avantages numériques."
   });
 }
 
@@ -250,7 +269,7 @@ Tu analyses des compositions de draft et fournis des recommandations d'itemisati
 CONNAISSANCES DU JOUEUR (à respecter impérativement) :
 ${knowledge}
 
-Réponds UNIQUEMENT en JSON valide, sans backticks ni texte autour, avec cette structure :
+Réponds UNIQUEMENT en JSON valide, sans backticks ni texte autour :
 {
   "build": [{"order":1,"name":"Nom item","tag":"core","reason":"1 phrase"}],
   "threats": ["label1"],
@@ -263,9 +282,19 @@ Réponds UNIQUEMENT en JSON valide, sans backticks ni texte autour, avec cette s
 Valeurs de tag : core, situational, boots. Valeurs de threatTypes : ad, ap, mixed, engage, poke, heal.`;
 }
 
-function buildUserPrompt(allies, enemies) {
-  return `Draft en cours. Je joue Shen Support.
+function buildUserPrompt(allies, enemies, priorityEnemy, alternativeBuild) {
+  let prompt = `Draft en cours. Je joue Shen Support.
 ALLIES : ${allies.map(a=>`${a.name} (${a.role})`).join(', ')}
-ENNEMIS : ${enemies.map(e=>`${e.name} (${e.role})`).join(', ')}
-Donne-moi le build optimal + conseils. JSON uniquement.`;
+ENNEMIS : ${enemies.map(e=>`${e.name} (${e.role})`).join(', ')}`;
+
+  if (priorityEnemy) {
+    prompt += `\n\n⚠️ ATTENTION : ${priorityEnemy} est FED / le carry prioritaire ennemi. Adapte le build ET les conseils en conséquence — c'est la menace numéro 1 de cette partie.`;
+  }
+
+  if (alternativeBuild) {
+    prompt += `\n\n📌 CONSIGNE SPÉCIALE : Propose une suggestion ALTERNATIVE au build classique. Explore des options moins conventionnelles mais viables pour cette composition spécifique. Explique en quoi cette approche diffère.`;
+  }
+
+  prompt += '\n\nJSON uniquement.';
+  return prompt;
 }
