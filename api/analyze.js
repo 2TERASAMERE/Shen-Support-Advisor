@@ -20,7 +20,9 @@ RÈGLES D'ITEMISATION PAR SITUATION :
 - Si compo poke ennemie (Xerath, Lux, Ezreal) : Rédemption en 3ème item avant les bottes.
 - Si ADC immobile et vulnérable au dive (Jinx, Kog'Maw, Aphelios) : Voeu du Chevalier en 3ème.
 - Si alliés ont des dégâts magiques significatifs : Masque Abyssal pour amplifier leurs dégâts.
-- Contre Zed, Talon ou assassin AD ciblant l'ADC : Gargoyle en 3ème item.
+- Contre une compo full AP sans alliés AP : Unending Despair en 5ème (MR + drain).
+- Contre Zed, Talon ou assassin AD ciblant l'ADC : Unending Despair en 3ème item (drain + MR).
+- Bandlepipes en 5ème item sur compo mixte : aura qui boost l'AS des alliés sur chaque CC, parfait avec le taunt de Shen.
 - Warmog en fin de build si besoin de sustain pour être présent partout via l'ulti.
 
 GAMEPLAY :
@@ -228,9 +230,9 @@ function buildLocalAnalysis(allies, enemies) {
   else if (hasDive||hasImmobileADC) build.push({ order:4, name:"Vœu du Chevalier",     tag:"situational", reason:"Protège le carry." });
   else                            build.push({ order:4, name:"Locket de l'Épouvantail", tag:"situational", reason:"AoE polyvalent." });
 
-  if (hasAllyAP)    build.push({ order:5, name:"Masque Abyssal",           tag:"situational", reason:"Amplifie les alliés AP." });
-  else if (isFullAP) build.push({ order:5, name:"Bouclier Solaire",         tag:"situational", reason:"MR + aura." });
-  else               build.push({ order:5, name:"Stoneplate de Gargouille", tag:"situational", reason:"Engage défensif." });
+  if (hasAllyAP)    build.push({ order:5, name:"Masque Abyssal",  tag:"situational", reason:"Amplifie les alliés AP." });
+  else if (isFullAP) build.push({ order:5, name:"Unending Despair", tag:"situational", reason:"MR + drain — idéal contre full AP." });
+  else               build.push({ order:5, name:"Bandlepipes",       tag:"situational", reason:"Aura engage — buff AS allié sur CC." });
 
   build.push({ order:6, name:"Armure de Warmog", tag:"situational", reason:"Sustain entre fights." });
 
